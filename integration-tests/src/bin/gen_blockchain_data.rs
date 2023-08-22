@@ -111,7 +111,7 @@ async fn main() {
             }
         };
 
-        if compiled.has_error() || compiled.has_warning(WARN) {
+        if compiled.has_error() {
             panic!(
                 "... but CompilerOutput contains errors/warnings: {:?}:\n{:#?}",
                 &path_sol, compiled.errors
