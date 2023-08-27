@@ -15,7 +15,7 @@ use ethers::{
 };
 use integration_tests::{
     get_client, get_provider, get_wallet, log_init, CompiledContract, GenDataOutput, CONTRACTS,
-    CONTRACTS_PATH, WARN,
+    CONTRACTS_PATH,
 };
 use log::{error, info};
 use serde::de::Deserialize;

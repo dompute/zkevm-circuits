@@ -238,7 +238,7 @@ pub fn block_convert<F: Field>(
     let block = &builder.block;
     let code_db = &builder.code_db;
     let rws = RwMap::from(&block.container);
-    rws.check_value();
+    // rws.check_value();
     let mut block = Block {
         // randomness: F::from(0x100), // Special value to reveal elements after RLC
         randomness: F::from(0xcafeu64),

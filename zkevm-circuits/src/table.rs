@@ -9,7 +9,7 @@ use crate::{
         word::{self, Word},
         Challenges,
     },
-    witness::{Block, BlockContext, MptUpdateRow, MptUpdates, Rw, RwMap, RwRow, Transaction},
+    witness::{Block, BlockContext, Rw, RwMap, RwRow, Transaction},
 };
 use bus_mapping::circuit_input_builder::{CopyDataType, CopyEvent, CopyStep};
 use core::iter::once;
@@ -37,8 +37,6 @@ pub(crate) mod copy_table;
 pub(crate) mod exp_table;
 /// keccak table
 pub(crate) mod keccak_table;
-/// mpt table
-pub(crate) mod mpt_table;
 /// rw table
 pub(crate) mod rw_table;
 /// tx table
@@ -53,7 +51,6 @@ pub(crate) use exp_table::ExpTable;
 pub(crate) use keccak_table::KeccakTable;
 pub(crate) use ux_table::UXTable;
 
-pub(crate) use mpt_table::{MPTProofType, MptTable};
 pub(crate) use rw_table::RwTable;
 pub(crate) use tx_table::{
     TxContextFieldTag, TxFieldTag, TxLogFieldTag, TxReceiptFieldTag, TxTable,

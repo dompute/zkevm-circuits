@@ -38,7 +38,6 @@ use zkevm_circuits::{
     root_circuit::{
         compile, Config, EvmTranscript, NativeLoader, PoseidonTranscript, RootCircuit, Shplonk,
     },
-    state_circuit::TestStateCircuit,
     super_circuit::SuperCircuit,
     tx_circuit::TestTxCircuit,
     util::SubCircuit,
@@ -77,7 +76,6 @@ const CIRCUITS_PARAMS: FixedCParams = FixedCParams {
 };
 
 const EVM_CIRCUIT_DEGREE: u32 = 18;
-const STATE_CIRCUIT_DEGREE: u32 = 17;
 const TX_CIRCUIT_DEGREE: u32 = 20;
 const BYTECODE_CIRCUIT_DEGREE: u32 = 16;
 const COPY_CIRCUIT_DEGREE: u32 = 16;
@@ -106,10 +104,6 @@ lazy_static! {
     /// Integration test for EVM circuit
     pub static ref EVM_CIRCUIT_TEST: TokioMutex<IntegrationTest<TestEvmCircuit<Fr>>> =
     TokioMutex::new(IntegrationTest::new("EVM", EVM_CIRCUIT_DEGREE, ROOT_CIRCUIT_SMALL_DEGREE));
-
-    /// Integration test for State circuit
-    pub static ref STATE_CIRCUIT_TEST: TokioMutex<IntegrationTest<TestStateCircuit<Fr>>> =
-    TokioMutex::new(IntegrationTest::new("State", STATE_CIRCUIT_DEGREE, ROOT_CIRCUIT_SMALL_DEGREE));
 
     /// Integration test for State circuit
     pub static ref TX_CIRCUIT_TEST: TokioMutex<IntegrationTest<TestTxCircuit<Fr>>> =

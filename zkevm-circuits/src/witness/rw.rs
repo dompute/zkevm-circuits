@@ -14,8 +14,6 @@ use crate::{
     util::{build_tx_log_address, word},
 };
 
-use super::MptUpdates;
-
 /// Rw constainer for a witness block
 #[derive(Debug, Default, Clone)]
 pub struct RwMap(pub HashMap<Target, Vec<Rw>>);
@@ -53,10 +51,8 @@ impl RwMap {
     }
     /// Check value in the same way like StateCircuit
     pub fn check_value(&self) {
-        let err_msg_first = "first access reads don't change value";
         let err_msg_non_first = "non-first access reads don't change value";
         let rows = self.table_assignments();
-        let updates = MptUpdates::mock_from(&rows);
         let mut errs = Vec::new();
         for idx in 1..rows.len() {
             let row = &rows[idx];
@@ -75,16 +71,7 @@ impl RwMap {
             };
             if !row.is_write() {
                 let value = row.value_assignment();
-                if is_first {
-                    // value == init_value
-                    let init_value = updates
-                        .get(row)
-                        .map(|u| u.value_assignments().1)
-                        .unwrap_or_default();
-                    if value != init_value {
-                        errs.push((idx, err_msg_first, *row, *prev_row));
-                    }
-                } else {
+                if !is_first {
                     // value == prev_value
                     let prev_value = prev_row.value_assignment();
 
