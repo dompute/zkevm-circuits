@@ -31,7 +31,6 @@ use crate::{
         ZERO_BYTE_GAS_COST,
     },
     table::{BlockTable, KeccakTable, LookupTable, TxFieldTag, TxTable},
-    tx_circuit::TX_LEN,
     util::{word::Word, Challenges, SubCircuit, SubCircuitConfig},
     witness,
 };
@@ -536,12 +535,12 @@ impl<F: Field> PiCircuitConfig<F> {
 
     #[inline]
     fn circuit_len_tx_id(txs: usize) -> usize {
-        N_BYTES_U64 * TX_LEN * txs + N_BYTES_U64 // empty row
+        N_BYTES_U64 // empty row
     }
 
     #[inline]
     fn circuit_len_tx_index(txs: usize) -> usize {
-        N_BYTES_U64 * TX_LEN * txs + N_BYTES_U64 // empty row
+        N_BYTES_U64 // empty row
     }
 
     fn assign_empty_txtable_row(
@@ -1556,7 +1555,7 @@ impl<F: Field> SubCircuit<F> for PiCircuit<F> {
                     .q_calldata_start
                     .enable(&mut region, tx_table_offset)?;
 
-                let mut call_data_offset = TX_LEN * self.max_txs + EMPTY_TX_ROW_COUNT;
+                let mut call_data_offset = EMPTY_TX_ROW_COUNT;
 
                 let txs = self.public_data.transactions.clone();
                 for (i, tx) in self.public_data.transactions.iter().enumerate() {

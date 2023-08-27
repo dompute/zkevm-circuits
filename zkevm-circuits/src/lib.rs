@@ -33,7 +33,6 @@ pub mod table;
 pub mod test_util;
 
 pub mod instance;
-pub mod tx_circuit;
 pub mod util;
 pub mod witness;
 
