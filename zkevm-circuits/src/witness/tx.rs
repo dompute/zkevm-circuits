@@ -89,6 +89,8 @@ pub struct Transaction {
     pub calls: Vec<Call>,
     /// The steps executioned in the transaction
     pub steps: Vec<ExecStep>,
+    /// Return data
+    pub return_value: Vec<u8>,
 }
 
 impl Transaction {
@@ -318,8 +320,8 @@ impl Transaction {
         ret
     }
 
-    /// Assignments for tx table
-    pub fn table_assignments_dyn<F: Field>(
+    /// Assignments for tx calldata
+    pub fn table_assignments_calldata<F: Field>(
         &self,
         _challenges: Challenges<Value<F>>,
     ) -> Vec<[Value<F>; 4]> {
@@ -330,6 +332,25 @@ impl Transaction {
                 [
                     Value::known(F::from(self.id as u64)),
                     Value::known(F::from(TxContextFieldTag::CallData as u64)),
+                    Value::known(F::from(idx as u64)),
+                    Value::known(F::from(*byte as u64)),
+                ]
+            })
+            .collect()
+    }
+
+    /// Assignments for tx returndata
+    pub fn table_assignments_returndata<F: Field>(
+        &self,
+        _challenges: Challenges<Value<F>>,
+    ) -> Vec<[Value<F>; 4]> {
+        self.return_value
+            .iter()
+            .enumerate()
+            .map(|(idx, byte)| {
+                [
+                    Value::known(F::from(self.id as u64)),
+                    Value::known(F::from(TxContextFieldTag::ReturnData as u64)),
                     Value::known(F::from(idx as u64)),
                     Value::known(F::from(*byte as u64)),
                 ]
@@ -879,6 +900,7 @@ impl From<MockTransaction> for Transaction {
             l1_fee_committed: Default::default(),
             calls: vec![],
             steps: vec![],
+            return_value: vec![],
         }
     }
 }
@@ -972,6 +994,7 @@ pub(super) fn tx_convert(
                     .collect::<Vec<ExecStep>>()
             })
             .collect(),
+        return_value: tx.return_value.clone(),
     }
 }
 

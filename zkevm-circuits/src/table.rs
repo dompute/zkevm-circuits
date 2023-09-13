@@ -177,6 +177,8 @@ pub enum TxFieldTag {
     TxType,
     /// The block number in which this tx is included.
     BlockNumber,
+    /// ReturnData
+    ReturnData,
 }
 impl_expr!(TxFieldTag);
 
@@ -304,7 +306,7 @@ impl TxTable {
                 // region that has a size parametrized by max_calldata with all
                 // the tx calldata.  This is required to achieve a constant fixed column tag
                 // regardless of the number of input txs or the calldata size of each tx.
-                let mut calldata_assignments: Vec<[Value<F>; 4]> = Vec::new();
+                let mut assignments: Vec<[Value<F>; 4]> = Vec::new();
                 // Assign Tx data (all tx fields except for calldata)
                 let padding_txs = (txs.len()..max_txs)
                     .into_iter()
@@ -318,7 +320,8 @@ impl TxTable {
                 for (i, tx) in txs.iter().chain(padding_txs.iter()).enumerate() {
                     debug_assert_eq!(i + 1, tx.id);
                     let tx_data = tx.table_assignments_fixed(*challenges);
-                    let tx_calldata = tx.table_assignments_dyn(*challenges);
+                    let tx_calldata = tx.table_assignments_calldata(*challenges);
+                    let tx_returndata = tx.table_assignments_returndata(*challenges);
                     for row in tx_data {
                         tx_value_cells.push(assign_row(
                             &mut region,
@@ -331,10 +334,11 @@ impl TxTable {
                         )?);
                         offset += 1;
                     }
-                    calldata_assignments.extend(tx_calldata.iter());
+                    assignments.extend(tx_calldata.iter());
+                    assignments.extend(tx_returndata.iter());
                 }
-                // Assign Tx calldata
-                for row in calldata_assignments.into_iter() {
+                // Assign Tx calldata & returnData
+                for row in assignments.into_iter() {
                     assign_row(
                         &mut region,
                         offset,

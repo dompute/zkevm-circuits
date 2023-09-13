@@ -232,7 +232,7 @@ impl<'a> CircuitInputBuilder {
     pub fn new_tx(
         &mut self,
         eth_tx: &eth_types::Transaction,
-        is_success: bool,
+        geth_trace: &GethExecTrace,
     ) -> Result<Transaction, Error> {
         let call_id = self.block_ctx.rwc.0;
 
@@ -247,7 +247,7 @@ impl<'a> CircuitInputBuilder {
             ),
         );
 
-        Transaction::new(call_id, &self.sdb, &mut self.code_db, eth_tx, is_success)
+        Transaction::new(call_id, &self.sdb, &mut self.code_db, eth_tx, geth_trace)
     }
 
     /// Iterate over all generated CallContext RwCounterEndOfReversion
@@ -538,7 +538,7 @@ impl<'a> CircuitInputBuilder {
         geth_trace: &GethExecTrace,
         is_last_tx: bool,
     ) -> Result<(), Error> {
-        let mut tx = self.new_tx(eth_tx, !geth_trace.failed)?;
+        let mut tx = self.new_tx(eth_tx, geth_trace)?;
 
         // Sanity check for transaction L1 fee.
         let tx_l1_fee = if tx.tx_type.is_l1_msg() {

@@ -212,6 +212,26 @@ impl PublicData {
             .collect::<Vec<u8>>()
     }
 
+    fn extra_pi_bytes(&self) -> Vec<u8> {
+        iter::empty()
+            .chain(self.transactions.iter().map(|tx| {
+                (
+                    tx.callee_address.unwrap_or(Address::zero()),
+                    &tx.call_data,
+                    &tx.return_value,
+                )
+            }))
+            .flat_map(|(to, calldata, return_value)| {
+                to.to_fixed_bytes()
+                    .iter()
+                    .copied()
+                    .chain(calldata.iter().copied())
+                    .chain(return_value.iter().copied())
+                    .collect_vec()
+            })
+            .collect_vec()
+    }
+
     fn get_pi(&self) -> H256 {
         let data_hash = H256(keccak256(self.data_bytes()));
         log::debug!(
@@ -223,6 +243,13 @@ impl PublicData {
         let pi_hash = keccak256(pi_bytes);
 
         H256(pi_hash)
+    }
+
+    fn get_extra_pi(&self) -> H256 {
+        let extra_pi_bytes = self.extra_pi_bytes();
+        let extra_pi_hash = keccak256(extra_pi_bytes);
+
+        H256(extra_pi_hash)
     }
 }
 
@@ -261,10 +288,13 @@ pub struct PiCircuitConfig<F: Field> {
     /// dedicated column to store the difficulty, coinbase constants
     constant: Column<Fixed>,
 
-    raw_public_inputs: Column<Advice>, // block, history_hashes, states, tx hashes
-    rpi_field_bytes: Column<Advice>,   // rpi in bytes
-    rpi_field_bytes_acc: Column<Advice>,
-    rpi_rlc_acc: Column<Advice>, // RLC(rpi) as the input to Keccak table
+    /// rpi_bytes contains data_bytes, pi_bytes, pi_hash
+    raw_public_inputs: Column<Advice>, // rpi => RLC of rpi_bytes
+    rpi_field_bytes: Column<Advice>, // rpi_bytes
+    rpi_field_bytes_acc: Column<Advice>, /* rpi_bytes_acc => accumulation of rpi using
+                                      * keccak_input OR evm_word randomness */
+    rpi_rlc_acc: Column<Advice>, /* rpi_rlc_acc => accumulation of rpi using keccak_input
+                                  * randomness */
     rpi_length_acc: Column<Advice>,
 
     // columns for padding in block context and tx hashes
@@ -288,6 +318,10 @@ pub struct PiCircuitConfig<F: Field> {
 
     // 32 big-endian bytes of pi_hash
     pi: Column<Instance>,
+
+    extra_pi_bytes: Column<Advice>,
+    // 32 big-endian bytes of extra_pi_hash
+    extra_pi: Column<Instance>,
 
     // External tables
     block_table: BlockTable,
@@ -348,6 +382,7 @@ impl<F: Field> SubCircuitConfig<F> for PiCircuitConfig<F> {
         let rpi = meta.advice_column_in(SecondPhase);
         // hold the raw public input's bytes
         let rpi_bytes = meta.advice_column();
+        let extra_pi_bytes = meta.advice_column();
         // hold the accumulated value of rpi_bytes (e.g. gas_limit in block_context)
         let rpi_bytes_acc = meta.advice_column_in(SecondPhase);
         // hold the accumulated value of rlc(rpi_bytes, keccak_input)
@@ -360,6 +395,7 @@ impl<F: Field> SubCircuitConfig<F> for PiCircuitConfig<F> {
         let real_rpi = meta.advice_column_in(SecondPhase);
 
         let pi = meta.instance_column();
+        let extra_pi = meta.instance_column();
 
         // Annotate table columns
         tx_table.annotate_columns(meta);
@@ -385,6 +421,7 @@ impl<F: Field> SubCircuitConfig<F> for PiCircuitConfig<F> {
 
         meta.enable_constant(constant);
         meta.enable_equality(rpi_bytes);
+        meta.enable_equality(extra_pi_bytes);
         meta.enable_equality(rpi_bytes_acc);
         meta.enable_equality(rpi);
         meta.enable_equality(rpi_length_acc);
@@ -395,6 +432,7 @@ impl<F: Field> SubCircuitConfig<F> for PiCircuitConfig<F> {
         meta.enable_equality(tx_table.value); // copy tx hashes to rpi
         meta.enable_equality(cum_num_txs);
         meta.enable_equality(pi);
+        meta.enable_equality(extra_pi);
 
         // 1. constrain rpi_bytes, rpi_bytes_acc, and rpi for each field
         meta.create_gate(
@@ -646,6 +684,8 @@ impl<F: Field> SubCircuitConfig<F> for PiCircuitConfig<F> {
             q_block_tag,
             is_block_num_txs,
             pi,
+            extra_pi_bytes,
+            extra_pi,
             _marker: PhantomData,
             q_block_context,
         }
@@ -1630,6 +1670,7 @@ impl<F: Field> SubCircuit<F> for PiCircuit<F> {
     /// Compute the public inputs for this circuit.
     fn instance(&self) -> Vec<Vec<F>> {
         let pi_hash = self.public_data.get_pi();
+        let extra_pi_hash = self.public_data.get_extra_pi();
 
         let public_inputs = iter::empty()
             .chain(
@@ -1640,7 +1681,16 @@ impl<F: Field> SubCircuit<F> for PiCircuit<F> {
             )
             .collect::<Vec<F>>();
 
-        vec![public_inputs]
+        let extra_public_inputs = iter::empty()
+            .chain(
+                extra_pi_hash
+                    .to_fixed_bytes()
+                    .into_iter()
+                    .map(|byte| F::from(byte as u64)),
+            )
+            .collect::<Vec<F>>();
+
+        vec![public_inputs, extra_public_inputs]
     }
 
     /// Make the assignments to the PiCircuit
@@ -1684,9 +1734,31 @@ impl<F: Field> SubCircuit<F> for PiCircuit<F> {
             },
         )?;
 
+        let extra_pi_cells = layouter.assign_region(
+            || "extra pi region",
+            |mut region| {
+                let extra_pi_hash = self.public_data.get_extra_pi();
+                let extra_pi_bytes = &extra_pi_hash.to_fixed_bytes();
+                let mut extra_pi_cells = Vec::new();
+                for (i, byte) in extra_pi_bytes.iter().enumerate() {
+                    extra_pi_cells.push(region.assign_advice_from_constant(
+                        || "extra field byte",
+                        config.extra_pi_bytes,
+                        i,
+                        F::from(*byte as u64),
+                    )?);
+                }
+                Ok(extra_pi_cells)
+            },
+        )?;
+
         // Constrain raw_public_input cells to public inputs
         for (i, pi_cell) in pi_cells.iter().enumerate() {
             layouter.constrain_instance(pi_cell.cell(), config.pi, i)?;
+        }
+
+        for (i, extra_pi_cell) in extra_pi_cells.iter().enumerate() {
+            layouter.constrain_instance(extra_pi_cell.cell(), config.extra_pi, i)?;
         }
 
         Ok(())

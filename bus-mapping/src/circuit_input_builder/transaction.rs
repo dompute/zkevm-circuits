@@ -242,6 +242,8 @@ pub struct Transaction {
     pub(crate) calls: Vec<Call>,
     /// Execution steps
     steps: Vec<ExecStep>,
+    /// Return data
+    pub return_value: Vec<u8>,
 }
 
 impl From<&Transaction> for geth_types::Transaction {
@@ -297,6 +299,7 @@ impl Transaction {
             l1_fee: Default::default(),
             l1_fee_committed: Default::default(),
             access_list: None,
+            return_value: Vec::new(),
         }
     }
 
@@ -306,54 +309,61 @@ impl Transaction {
         sdb: &StateDB,
         code_db: &mut CodeDB,
         eth_tx: &eth_types::Transaction,
-        is_success: bool,
+        geth_trace: &GethExecTrace,
     ) -> Result<Self, Error> {
         let (found, _) = sdb.get_account(&eth_tx.from);
         if !found {
             return Err(Error::AccountNotFound(eth_tx.from));
         }
+        let is_success = !geth_trace.failed;
 
-        let call = if let Some(address) = eth_tx.to {
+        let (call, return_value) = if let Some(address) = eth_tx.to {
             // Contract Call / Transfer
             let (found, account) = sdb.get_account(&address);
             if !found {
                 return Err(Error::AccountNotFound(address));
             }
             let code_hash = account.code_hash;
-            Call {
-                call_id,
-                kind: CallKind::Call,
-                is_root: true,
-                is_persistent: is_success,
-                is_success,
-                caller_address: eth_tx.from,
-                address,
-                code_source: CodeSource::Address(address),
-                code_hash,
-                depth: 1,
-                value: eth_tx.value,
-                call_data_length: eth_tx.input.as_ref().len() as u64,
-                ..Default::default()
-            }
+            (
+                Call {
+                    call_id,
+                    kind: CallKind::Call,
+                    is_root: true,
+                    is_persistent: is_success,
+                    is_success,
+                    caller_address: eth_tx.from,
+                    address,
+                    code_source: CodeSource::Address(address),
+                    code_hash,
+                    depth: 1,
+                    value: eth_tx.value,
+                    call_data_length: eth_tx.input.as_ref().len() as u64,
+                    ..Default::default()
+                },
+                hex::decode(&geth_trace.return_value[2..]).unwrap(),
+            )
         } else {
             // Contract creation
             let code_hash = code_db.insert(eth_tx.input.to_vec());
             let address = get_contract_address(eth_tx.from, eth_tx.nonce);
-            Call {
-                call_id,
-                kind: CallKind::Create,
-                is_root: true,
-                is_persistent: is_success,
-                is_success,
-                caller_address: eth_tx.from,
-                address,
-                code_source: CodeSource::Tx,
-                code_hash,
-                depth: 1,
-                value: eth_tx.value,
-                call_data_length: 0,
-                ..Default::default()
-            }
+            (
+                Call {
+                    call_id,
+                    kind: CallKind::Create,
+                    is_root: true,
+                    is_persistent: is_success,
+                    is_success,
+                    caller_address: eth_tx.from,
+                    address,
+                    code_source: CodeSource::Tx,
+                    code_hash,
+                    depth: 1,
+                    value: eth_tx.value,
+                    call_data_length: 0,
+                    ..Default::default()
+                },
+                Vec::new(),
+            )
         };
 
         log::debug!(
@@ -410,6 +420,7 @@ impl Transaction {
             l1_fee,
             l1_fee_committed,
             access_list: eth_tx.access_list.clone(),
+            return_value,
         })
     }
 
