@@ -59,11 +59,9 @@ pub(crate) static CHECK_RW_LOOKUP: Lazy<bool> =
 mod add_sub;
 mod addmod;
 mod address;
-mod balance;
 mod begin_tx;
 mod bitwise;
 mod block_ctx;
-mod blockhash;
 mod byte;
 mod calldatacopy;
 mod calldataload;
@@ -71,7 +69,6 @@ mod calldatasize;
 mod caller;
 mod callop;
 mod callvalue;
-mod chainid;
 mod codecopy;
 mod codesize;
 mod comparator;
@@ -92,34 +89,26 @@ mod error_oog_constant;
 mod error_oog_create;
 mod error_oog_dynamic_memory;
 mod error_oog_exp;
-mod error_oog_log;
 mod error_oog_memory_copy;
 mod error_oog_precompile;
 mod error_oog_sha3;
-mod error_oog_sload_sstore;
 mod error_oog_static_memory;
 mod error_precompile_failed;
 mod error_return_data_oo_bound;
 mod error_stack;
 mod error_write_protection;
 mod exp;
-mod extcodecopy;
-mod extcodehash;
-mod extcodesize;
 mod gas;
-mod gasprice;
 mod is_zero;
 mod jump;
 mod jumpdest;
 mod jumpi;
-mod logs;
 mod memory;
 mod msize;
 mod mul_div_mod;
 mod mulmod;
 #[path = "execution/not.rs"]
 mod opcode_not;
-mod origin;
 mod pc;
 mod pop;
 mod precompiles;
@@ -134,20 +123,16 @@ mod sha3;
 mod shl_shr;
 mod signed_comparator;
 mod signextend;
-mod sload;
-mod sstore;
 mod stop;
 mod swap;
 
-use self::{logs::LogGadget, precompiles::BasePrecompileGadget, sha3::Sha3Gadget};
+use self::{precompiles::BasePrecompileGadget, sha3::Sha3Gadget};
 use add_sub::AddSubGadget;
 use addmod::AddModGadget;
 use address::AddressGadget;
-use balance::BalanceGadget;
 use begin_tx::BeginTxGadget;
 use bitwise::BitwiseGadget;
 use block_ctx::{BlockCtxU160Gadget, BlockCtxU256Gadget, BlockCtxU64Gadget};
-use blockhash::BlockHashGadget;
 use byte::ByteGadget;
 use calldatacopy::CallDataCopyGadget;
 use calldataload::CallDataLoadGadget;
@@ -155,7 +140,6 @@ use calldatasize::CallDataSizeGadget;
 use caller::CallerGadget;
 use callop::CallOpGadget;
 use callvalue::CallValueGadget;
-use chainid::ChainIdGadget;
 use codecopy::CodeCopyGadget;
 use codesize::CodesizeGadget;
 use comparator::ComparatorGadget;
@@ -176,21 +160,15 @@ use error_oog_constant::ErrorOOGConstantGadget;
 use error_oog_create::ErrorOOGCreateGadget;
 use error_oog_dynamic_memory::ErrorOOGDynamicMemoryGadget;
 use error_oog_exp::ErrorOOGExpGadget;
-use error_oog_log::ErrorOOGLogGadget;
 use error_oog_memory_copy::ErrorOOGMemoryCopyGadget;
 use error_oog_sha3::ErrorOOGSha3Gadget;
-use error_oog_sload_sstore::ErrorOOGSloadSstoreGadget;
 use error_oog_static_memory::ErrorOOGStaticMemoryGadget;
 use error_precompile_failed::ErrorPrecompileFailedGadget;
 use error_return_data_oo_bound::ErrorReturnDataOutOfBoundGadget;
 use error_stack::ErrorStackGadget;
 use error_write_protection::ErrorWriteProtectionGadget;
 use exp::ExponentiationGadget;
-use extcodecopy::ExtcodecopyGadget;
-use extcodehash::ExtcodehashGadget;
-use extcodesize::ExtcodesizeGadget;
 use gas::GasGadget;
-use gasprice::GasPriceGadget;
 use is_zero::IsZeroGadget;
 use jump::JumpGadget;
 use jumpdest::JumpdestGadget;
@@ -202,7 +180,6 @@ use msize::MsizeGadget;
 use mul_div_mod::MulDivModGadget;
 use mulmod::MulModGadget;
 use opcode_not::NotGadget;
-use origin::OriginGadget;
 use pc::PcGadget;
 use pop::PopGadget;
 use precompiles::{
@@ -218,8 +195,6 @@ use selfbalance::SelfbalanceGadget;
 use shl_shr::ShlShrGadget;
 use signed_comparator::SignedComparatorGadget;
 use signextend::SignextendGadget;
-use sload::SloadGadget;
-use sstore::SstoreGadget;
 use stop::StopGadget;
 use swap::SwapGadget;
 
@@ -272,7 +247,6 @@ pub(crate) struct ExecutionConfig<F> {
     add_sub_gadget: Box<AddSubGadget<F>>,
     addmod_gadget: Box<AddModGadget<F>>,
     address_gadget: Box<AddressGadget<F>>,
-    balance_gadget: Box<BalanceGadget<F>>,
     bitwise_gadget: Box<BitwiseGadget<F>>,
     byte_gadget: Box<ByteGadget<F>>,
     call_op_gadget: Box<CallOpGadget<F>>,
@@ -281,28 +255,21 @@ pub(crate) struct ExecutionConfig<F> {
     calldataload_gadget: Box<CallDataLoadGadget<F>>,
     calldatasize_gadget: Box<CallDataSizeGadget<F>>,
     caller_gadget: Box<CallerGadget<F>>,
-    chainid_gadget: Box<ChainIdGadget<F>>,
     codecopy_gadget: Box<CodeCopyGadget<F>>,
     codesize_gadget: Box<CodesizeGadget<F>>,
     comparator_gadget: Box<ComparatorGadget<F>>,
     dup_gadget: Box<DupGadget<F>>,
     exp_gadget: Box<ExponentiationGadget<F>>,
-    extcodehash_gadget: Box<ExtcodehashGadget<F>>,
-    extcodesize_gadget: Box<ExtcodesizeGadget<F>>,
-    extcodecopy_gadget: Box<ExtcodecopyGadget<F>>,
     gas_gadget: Box<GasGadget<F>>,
-    gasprice_gadget: Box<GasPriceGadget<F>>,
     iszero_gadget: Box<IsZeroGadget<F>>,
     jump_gadget: Box<JumpGadget<F>>,
     jumpdest_gadget: Box<JumpdestGadget<F>>,
     jumpi_gadget: Box<JumpiGadget<F>>,
-    log_gadget: Box<LogGadget<F>>,
     memory_gadget: Box<MemoryGadget<F>>,
     msize_gadget: Box<MsizeGadget<F>>,
     mul_div_mod_gadget: Box<MulDivModGadget<F>>,
     mulmod_gadget: Box<MulModGadget<F>>,
     not_gadget: Box<NotGadget<F>>,
-    origin_gadget: Box<OriginGadget<F>>,
     pc_gadget: Box<PcGadget<F>>,
     pop_gadget: Box<PopGadget<F>>,
     push_gadget: Box<PushGadget<F>>,
@@ -320,11 +287,8 @@ pub(crate) struct ExecutionConfig<F> {
     selfdestruct_gadget: Box<DummyGadget<F, 1, 0, { ExecutionState::SELFDESTRUCT }>>,
     signed_comparator_gadget: Box<SignedComparatorGadget<F>>,
     signextend_gadget: Box<SignextendGadget<F>>,
-    sload_gadget: Box<SloadGadget<F>>,
-    sstore_gadget: Box<SstoreGadget<F>>,
     stop_gadget: Box<StopGadget<F>>,
     swap_gadget: Box<SwapGadget<F>>,
-    blockhash_gadget: Box<BlockHashGadget<F>>,
     block_ctx_u64_gadget: Box<BlockCtxU64Gadget<F>>,
     block_ctx_u160_gadget: Box<BlockCtxU160Gadget<F>>,
     block_ctx_u256_gadget: Box<BlockCtxU256Gadget<F>>,
@@ -334,12 +298,10 @@ pub(crate) struct ExecutionConfig<F> {
     error_oog_constant: Box<ErrorOOGConstantGadget<F>>,
     error_oog_exp: Box<ErrorOOGExpGadget<F>>,
     error_oog_memory_copy: Box<ErrorOOGMemoryCopyGadget<F>>,
-    error_oog_sload_sstore: Box<ErrorOOGSloadSstoreGadget<F>>,
     error_oog_static_memory_gadget: Box<ErrorOOGStaticMemoryGadget<F>>,
     error_stack: Box<ErrorStackGadget<F>>,
     error_write_protection: Box<ErrorWriteProtectionGadget<F>>,
     error_oog_dynamic_memory_gadget: Box<ErrorOOGDynamicMemoryGadget<F>>,
-    error_oog_log: Box<ErrorOOGLogGadget<F>>,
     error_oog_account_access: Box<ErrorOOGAccountAccessGadget<F>>,
     error_oog_sha3: Box<ErrorOOGSha3Gadget<F>>,
     error_oog_create: Box<ErrorOOGCreateGadget<F>>,
@@ -557,26 +519,20 @@ impl<F: Field> ExecutionConfig<F> {
             calldataload_gadget: configure_gadget!(),
             calldatasize_gadget: configure_gadget!(),
             caller_gadget: configure_gadget!(),
-            chainid_gadget: configure_gadget!(),
             codecopy_gadget: configure_gadget!(),
             codesize_gadget: configure_gadget!(),
             comparator_gadget: configure_gadget!(),
             dup_gadget: configure_gadget!(),
-            extcodehash_gadget: configure_gadget!(),
-            extcodesize_gadget: configure_gadget!(),
             gas_gadget: configure_gadget!(),
-            gasprice_gadget: configure_gadget!(),
             iszero_gadget: configure_gadget!(),
             jump_gadget: configure_gadget!(),
             jumpdest_gadget: configure_gadget!(),
             jumpi_gadget: configure_gadget!(),
-            log_gadget: configure_gadget!(),
             memory_gadget: configure_gadget!(),
             msize_gadget: configure_gadget!(),
             mul_div_mod_gadget: configure_gadget!(),
             mulmod_gadget: configure_gadget!(),
             not_gadget: configure_gadget!(),
-            origin_gadget: configure_gadget!(),
             pc_gadget: configure_gadget!(),
             pop_gadget: configure_gadget!(),
             push_gadget: configure_gadget!(),
@@ -585,11 +541,8 @@ impl<F: Field> ExecutionConfig<F> {
             selfbalance_gadget: configure_gadget!(),
             sha3_gadget: configure_gadget!(),
             address_gadget: configure_gadget!(),
-            balance_gadget: configure_gadget!(),
-            blockhash_gadget: configure_gadget!(),
             exp_gadget: configure_gadget!(),
             sar_gadget: configure_gadget!(),
-            extcodecopy_gadget: configure_gadget!(),
             returndatasize_gadget: configure_gadget!(),
             returndatacopy_gadget: configure_gadget!(),
             create_gadget: configure_gadget!(),
@@ -599,8 +552,6 @@ impl<F: Field> ExecutionConfig<F> {
             shl_shr_gadget: configure_gadget!(),
             signed_comparator_gadget: configure_gadget!(),
             signextend_gadget: configure_gadget!(),
-            sload_gadget: configure_gadget!(),
-            sstore_gadget: configure_gadget!(),
             stop_gadget: configure_gadget!(),
             swap_gadget: configure_gadget!(),
             block_ctx_u64_gadget: configure_gadget!(),
@@ -611,8 +562,6 @@ impl<F: Field> ExecutionConfig<F> {
             error_oog_static_memory_gadget: configure_gadget!(),
             error_stack: configure_gadget!(),
             error_oog_dynamic_memory_gadget: configure_gadget!(),
-            error_oog_log: configure_gadget!(),
-            error_oog_sload_sstore: configure_gadget!(),
             error_oog_call: configure_gadget!(),
             error_oog_precompile: configure_gadget!(),
             error_oog_memory_copy: configure_gadget!(),
@@ -1391,7 +1340,7 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::ADD_SUB => assign_exec_step!(self.add_sub_gadget),
             ExecutionState::ADDMOD => assign_exec_step!(self.addmod_gadget),
             ExecutionState::ADDRESS => assign_exec_step!(self.address_gadget),
-            ExecutionState::BALANCE => assign_exec_step!(self.balance_gadget),
+            ExecutionState::BALANCE => unimplemented!("not support"),
             ExecutionState::BITWISE => assign_exec_step!(self.bitwise_gadget),
             ExecutionState::BYTE => assign_exec_step!(self.byte_gadget),
             ExecutionState::CALL_OP => assign_exec_step!(self.call_op_gadget),
@@ -1400,27 +1349,27 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::CALLDATASIZE => assign_exec_step!(self.calldatasize_gadget),
             ExecutionState::CALLER => assign_exec_step!(self.caller_gadget),
             ExecutionState::CALLVALUE => assign_exec_step!(self.call_value_gadget),
-            ExecutionState::CHAINID => assign_exec_step!(self.chainid_gadget),
+            ExecutionState::CHAINID => unimplemented!("not support"),
             ExecutionState::CODECOPY => assign_exec_step!(self.codecopy_gadget),
             ExecutionState::CODESIZE => assign_exec_step!(self.codesize_gadget),
             ExecutionState::CMP => assign_exec_step!(self.comparator_gadget),
             ExecutionState::DUP => assign_exec_step!(self.dup_gadget),
             ExecutionState::EXP => assign_exec_step!(self.exp_gadget),
-            ExecutionState::EXTCODEHASH => assign_exec_step!(self.extcodehash_gadget),
-            ExecutionState::EXTCODESIZE => assign_exec_step!(self.extcodesize_gadget),
+            ExecutionState::EXTCODEHASH => unimplemented!("not support"),
+            ExecutionState::EXTCODESIZE => unimplemented!("not support"),
             ExecutionState::GAS => assign_exec_step!(self.gas_gadget),
-            ExecutionState::GASPRICE => assign_exec_step!(self.gasprice_gadget),
+            ExecutionState::GASPRICE => unimplemented!("not support"),
             ExecutionState::ISZERO => assign_exec_step!(self.iszero_gadget),
             ExecutionState::JUMP => assign_exec_step!(self.jump_gadget),
             ExecutionState::JUMPDEST => assign_exec_step!(self.jumpdest_gadget),
             ExecutionState::JUMPI => assign_exec_step!(self.jumpi_gadget),
-            ExecutionState::LOG => assign_exec_step!(self.log_gadget),
+            ExecutionState::LOG => unimplemented!("not support"),
             ExecutionState::MEMORY => assign_exec_step!(self.memory_gadget),
             ExecutionState::MSIZE => assign_exec_step!(self.msize_gadget),
             ExecutionState::MUL_DIV_MOD => assign_exec_step!(self.mul_div_mod_gadget),
             ExecutionState::MULMOD => assign_exec_step!(self.mulmod_gadget),
             ExecutionState::NOT => assign_exec_step!(self.not_gadget),
-            ExecutionState::ORIGIN => assign_exec_step!(self.origin_gadget),
+            ExecutionState::ORIGIN => unimplemented!("not support"),
             ExecutionState::PC => assign_exec_step!(self.pc_gadget),
             ExecutionState::POP => assign_exec_step!(self.pop_gadget),
             ExecutionState::PUSH => assign_exec_step!(self.push_gadget),
@@ -1433,12 +1382,12 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::BLOCKCTXU64 => assign_exec_step!(self.block_ctx_u64_gadget),
             ExecutionState::BLOCKCTXU160 => assign_exec_step!(self.block_ctx_u160_gadget),
             ExecutionState::BLOCKCTXU256 => assign_exec_step!(self.block_ctx_u256_gadget),
-            ExecutionState::BLOCKHASH => assign_exec_step!(self.blockhash_gadget),
+            ExecutionState::BLOCKHASH => unimplemented!("not support"),
             ExecutionState::SELFBALANCE => assign_exec_step!(self.selfbalance_gadget),
             ExecutionState::CREATE => assign_exec_step!(self.create_gadget),
             ExecutionState::CREATE2 => assign_exec_step!(self.create2_gadget),
             // dummy gadgets
-            ExecutionState::EXTCODECOPY => assign_exec_step!(self.extcodecopy_gadget),
+            ExecutionState::EXTCODECOPY => unimplemented!("not support"),
             ExecutionState::SELFDESTRUCT => {
                 #[cfg(not(feature = "scroll"))]
                 assign_exec_step!(self.selfdestruct_gadget)
@@ -1447,8 +1396,8 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::SHA3 => assign_exec_step!(self.sha3_gadget),
             ExecutionState::SHL_SHR => assign_exec_step!(self.shl_shr_gadget),
             ExecutionState::SIGNEXTEND => assign_exec_step!(self.signextend_gadget),
-            ExecutionState::SLOAD => assign_exec_step!(self.sload_gadget),
-            ExecutionState::SSTORE => assign_exec_step!(self.sstore_gadget),
+            ExecutionState::SLOAD => unimplemented!("not support"),
+            ExecutionState::SSTORE => unimplemented!("not support"),
             ExecutionState::STOP => assign_exec_step!(self.stop_gadget),
             ExecutionState::SWAP => assign_exec_step!(self.swap_gadget),
             // dummy errors
@@ -1468,10 +1417,10 @@ impl<F: Field> ExecutionConfig<F> {
                 assign_exec_step!(self.error_oog_dynamic_memory_gadget)
             }
             ExecutionState::ErrorOutOfGasLOG => {
-                assign_exec_step!(self.error_oog_log)
+                unimplemented!("not support")
             }
             ExecutionState::ErrorOutOfGasSloadSstore => {
-                assign_exec_step!(self.error_oog_sload_sstore)
+                unimplemented!("not support")
             }
             ExecutionState::ErrorOutOfGasMemoryCopy => {
                 assign_exec_step!(self.error_oog_memory_copy)
