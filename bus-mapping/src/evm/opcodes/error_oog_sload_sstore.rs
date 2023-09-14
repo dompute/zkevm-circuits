@@ -19,10 +19,10 @@ impl Opcode for OOGSloadSstore {
         geth_steps: &[GethExecStep],
     ) -> Result<Vec<ExecStep>, Error> {
         let geth_step = &geth_steps[0];
-        debug_assert!([OpcodeId::SLOAD, OpcodeId::SSTORE].contains(&geth_step.op));
+        // debug_assert!([OpcodeId::SLOAD, OpcodeId::SSTORE].contains(&geth_step.op));
 
         let mut exec_step = state.new_step(geth_step)?;
-        exec_step.error = Some(ExecError::OutOfGas(OogError::SloadSstore));
+        // exec_step.error = Some(ExecError::OutOfGas(OogError::SloadSstore));
 
         let call_id = state.call()?.call_id;
         let callee_address = state.call()?.address;
@@ -68,26 +68,26 @@ impl Opcode for OOGSloadSstore {
         )?;
 
         // Special operations are only used for SSTORE.
-        if geth_step.op == OpcodeId::SSTORE {
-            let value = geth_step.stack.nth_last(1)?;
-            state.stack_read(&mut exec_step, geth_step.stack.nth_last_filled(1), value)?;
+        // if geth_step.op == OpcodeId::SSTORE {
+        //     let value = geth_step.stack.nth_last(1)?;
+        //     state.stack_read(&mut exec_step, geth_step.stack.nth_last_filled(1), value)?;
 
-            let (_, value_prev) = state.sdb.get_storage(&callee_address, &key);
-            let (_, original_value) = state.sdb.get_committed_storage(&callee_address, &key);
+        //     let (_, value_prev) = state.sdb.get_storage(&callee_address, &key);
+        //     let (_, original_value) = state.sdb.get_committed_storage(&callee_address, &key);
 
-            state.push_op(
-                &mut exec_step,
-                RW::READ,
-                StorageOp::new(
-                    callee_address,
-                    key,
-                    *value_prev,
-                    *value_prev,
-                    tx_id,
-                    *original_value,
-                ),
-            )?;
-        }
+        //     state.push_op(
+        //         &mut exec_step,
+        //         RW::READ,
+        //         StorageOp::new(
+        //             callee_address,
+        //             key,
+        //             *value_prev,
+        //             *value_prev,
+        //             tx_id,
+        //             *original_value,
+        //         ),
+        //     )?;
+        // }
 
         state.handle_return(&mut [&mut exec_step], geth_steps, true)?;
         Ok(vec![exec_step])

@@ -87,13 +87,13 @@ pub enum OogError {
     /// creation
     CodeStore,
     /// Out of Gas for LOG0, LOG1, LOG2, LOG3, LOG4
-    Log,
+    // Log,
     /// Out of Gas for EXP
     Exp,
     /// Out of Gas for SHA3
     Sha3,
-    /// Out of Gas for SLOAD and SSTORE
-    SloadSstore,
+    // /// Out of Gas for SLOAD and SSTORE
+    // SloadSstore,
     /// Out of Gas for CALL, CALLCODE, DELEGATECALL and STATICCALL
     Call,
     /// Out of Gas for Precompile.
@@ -195,20 +195,20 @@ pub(crate) fn get_step_reported_error(op: &OpcodeId, error: &str) -> ExecError {
             OpcodeId::RETURN | OpcodeId::REVERT => OogError::DynamicMemoryExpansion,
             OpcodeId::CALLDATACOPY
             | OpcodeId::CODECOPY
-            | OpcodeId::EXTCODECOPY
+            // | OpcodeId::EXTCODECOPY
             | OpcodeId::RETURNDATACOPY => OogError::MemoryCopy,
-            OpcodeId::BALANCE | OpcodeId::EXTCODESIZE | OpcodeId::EXTCODEHASH => {
-                OogError::AccountAccess
-            }
-            OpcodeId::LOG0 | OpcodeId::LOG1 | OpcodeId::LOG2 | OpcodeId::LOG3 | OpcodeId::LOG4 => {
-                OogError::Log
-            }
+            // OpcodeId::BALANCE | OpcodeId::EXTCODESIZE | OpcodeId::EXTCODEHASH => {
+            //     OogError::AccountAccess
+            // }
+            // OpcodeId::LOG0 | OpcodeId::LOG1 | OpcodeId::LOG2 | OpcodeId::LOG3 | OpcodeId::LOG4 => {
+            //     OogError::Log
+            // }
             OpcodeId::EXP => OogError::Exp,
             OpcodeId::SHA3 => OogError::Sha3,
             OpcodeId::CALL | OpcodeId::CALLCODE | OpcodeId::DELEGATECALL | OpcodeId::STATICCALL => {
                 OogError::Call
             }
-            OpcodeId::SLOAD | OpcodeId::SSTORE => OogError::SloadSstore,
+            // OpcodeId::SLOAD | OpcodeId::SSTORE => OogError::SloadSstore,
             OpcodeId::CREATE | OpcodeId::CREATE2 => OogError::Create,
             OpcodeId::SELFDESTRUCT => OogError::SelfDestruct,
             _ => OogError::Constant,

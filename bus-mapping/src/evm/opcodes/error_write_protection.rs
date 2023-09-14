@@ -30,16 +30,10 @@ impl Opcode for ErrorWriteProtection {
         let current_call = state.call()?.clone();
         // assert op code can only be following codes
         assert!([
-            OpcodeId::SSTORE,
             OpcodeId::CREATE,
             OpcodeId::CREATE2,
             OpcodeId::CALL,
             OpcodeId::SELFDESTRUCT,
-            OpcodeId::LOG0,
-            OpcodeId::LOG1,
-            OpcodeId::LOG2,
-            OpcodeId::LOG3,
-            OpcodeId::LOG4
         ]
         .contains(&geth_step.op));
 

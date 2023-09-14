@@ -1340,7 +1340,6 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::ADD_SUB => assign_exec_step!(self.add_sub_gadget),
             ExecutionState::ADDMOD => assign_exec_step!(self.addmod_gadget),
             ExecutionState::ADDRESS => assign_exec_step!(self.address_gadget),
-            ExecutionState::BALANCE => unimplemented!("not support"),
             ExecutionState::BITWISE => assign_exec_step!(self.bitwise_gadget),
             ExecutionState::BYTE => assign_exec_step!(self.byte_gadget),
             ExecutionState::CALL_OP => assign_exec_step!(self.call_op_gadget),
@@ -1349,27 +1348,21 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::CALLDATASIZE => assign_exec_step!(self.calldatasize_gadget),
             ExecutionState::CALLER => assign_exec_step!(self.caller_gadget),
             ExecutionState::CALLVALUE => assign_exec_step!(self.call_value_gadget),
-            ExecutionState::CHAINID => unimplemented!("not support"),
             ExecutionState::CODECOPY => assign_exec_step!(self.codecopy_gadget),
             ExecutionState::CODESIZE => assign_exec_step!(self.codesize_gadget),
             ExecutionState::CMP => assign_exec_step!(self.comparator_gadget),
             ExecutionState::DUP => assign_exec_step!(self.dup_gadget),
             ExecutionState::EXP => assign_exec_step!(self.exp_gadget),
-            ExecutionState::EXTCODEHASH => unimplemented!("not support"),
-            ExecutionState::EXTCODESIZE => unimplemented!("not support"),
             ExecutionState::GAS => assign_exec_step!(self.gas_gadget),
-            ExecutionState::GASPRICE => unimplemented!("not support"),
             ExecutionState::ISZERO => assign_exec_step!(self.iszero_gadget),
             ExecutionState::JUMP => assign_exec_step!(self.jump_gadget),
             ExecutionState::JUMPDEST => assign_exec_step!(self.jumpdest_gadget),
             ExecutionState::JUMPI => assign_exec_step!(self.jumpi_gadget),
-            ExecutionState::LOG => unimplemented!("not support"),
             ExecutionState::MEMORY => assign_exec_step!(self.memory_gadget),
             ExecutionState::MSIZE => assign_exec_step!(self.msize_gadget),
             ExecutionState::MUL_DIV_MOD => assign_exec_step!(self.mul_div_mod_gadget),
             ExecutionState::MULMOD => assign_exec_step!(self.mulmod_gadget),
             ExecutionState::NOT => assign_exec_step!(self.not_gadget),
-            ExecutionState::ORIGIN => unimplemented!("not support"),
             ExecutionState::PC => assign_exec_step!(self.pc_gadget),
             ExecutionState::POP => assign_exec_step!(self.pop_gadget),
             ExecutionState::PUSH => assign_exec_step!(self.push_gadget),
@@ -1382,12 +1375,10 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::BLOCKCTXU64 => assign_exec_step!(self.block_ctx_u64_gadget),
             ExecutionState::BLOCKCTXU160 => assign_exec_step!(self.block_ctx_u160_gadget),
             ExecutionState::BLOCKCTXU256 => assign_exec_step!(self.block_ctx_u256_gadget),
-            ExecutionState::BLOCKHASH => unimplemented!("not support"),
             ExecutionState::SELFBALANCE => assign_exec_step!(self.selfbalance_gadget),
             ExecutionState::CREATE => assign_exec_step!(self.create_gadget),
             ExecutionState::CREATE2 => assign_exec_step!(self.create2_gadget),
             // dummy gadgets
-            ExecutionState::EXTCODECOPY => unimplemented!("not support"),
             ExecutionState::SELFDESTRUCT => {
                 #[cfg(not(feature = "scroll"))]
                 assign_exec_step!(self.selfdestruct_gadget)
@@ -1396,8 +1387,6 @@ impl<F: Field> ExecutionConfig<F> {
             ExecutionState::SHA3 => assign_exec_step!(self.sha3_gadget),
             ExecutionState::SHL_SHR => assign_exec_step!(self.shl_shr_gadget),
             ExecutionState::SIGNEXTEND => assign_exec_step!(self.signextend_gadget),
-            ExecutionState::SLOAD => unimplemented!("not support"),
-            ExecutionState::SSTORE => unimplemented!("not support"),
             ExecutionState::STOP => assign_exec_step!(self.stop_gadget),
             ExecutionState::SWAP => assign_exec_step!(self.swap_gadget),
             // dummy errors
@@ -1415,12 +1404,6 @@ impl<F: Field> ExecutionConfig<F> {
             }
             ExecutionState::ErrorOutOfGasDynamicMemoryExpansion => {
                 assign_exec_step!(self.error_oog_dynamic_memory_gadget)
-            }
-            ExecutionState::ErrorOutOfGasLOG => {
-                unimplemented!("not support")
-            }
-            ExecutionState::ErrorOutOfGasSloadSstore => {
-                unimplemented!("not support")
             }
             ExecutionState::ErrorOutOfGasMemoryCopy => {
                 assign_exec_step!(self.error_oog_memory_copy)

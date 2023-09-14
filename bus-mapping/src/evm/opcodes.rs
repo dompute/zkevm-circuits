@@ -196,23 +196,16 @@ fn fn_gen_associated_ops(opcode_id: &OpcodeId) -> FnGenAssociatedOps {
         OpcodeId::SAR => StackOnlyOpcode::<2, 1>::gen_associated_ops,
         OpcodeId::SHA3 => Sha3::gen_associated_ops,
         OpcodeId::ADDRESS => Address::gen_associated_ops,
-        OpcodeId::BALANCE => Balance::gen_associated_ops,
-        OpcodeId::ORIGIN => Origin::gen_associated_ops,
         OpcodeId::CALLER => Caller::gen_associated_ops,
         OpcodeId::CALLVALUE => Callvalue::gen_associated_ops,
         OpcodeId::CALLDATASIZE => Calldatasize::gen_associated_ops,
         OpcodeId::CALLDATALOAD => Calldataload::gen_associated_ops,
         OpcodeId::CALLDATACOPY => Calldatacopy::gen_associated_ops,
-        OpcodeId::GASPRICE => GasPrice::gen_associated_ops,
         OpcodeId::CODECOPY => Codecopy::gen_associated_ops,
         OpcodeId::CODESIZE => Codesize::gen_associated_ops,
         OpcodeId::EXP => Exponentiation::gen_associated_ops,
-        OpcodeId::EXTCODESIZE => Extcodesize::gen_associated_ops,
-        OpcodeId::EXTCODECOPY => Extcodecopy::gen_associated_ops,
         OpcodeId::RETURNDATASIZE => Returndatasize::gen_associated_ops,
         OpcodeId::RETURNDATACOPY => Returndatacopy::gen_associated_ops,
-        OpcodeId::EXTCODEHASH => Extcodehash::gen_associated_ops,
-        OpcodeId::BLOCKHASH => Blockhash::gen_associated_ops,
         OpcodeId::COINBASE => StackOnlyOpcode::<0, 1>::gen_associated_ops,
         OpcodeId::TIMESTAMP => StackOnlyOpcode::<0, 1>::gen_associated_ops,
         OpcodeId::NUMBER => StackOnlyOpcode::<0, 1>::gen_associated_ops,
@@ -225,8 +218,6 @@ fn fn_gen_associated_ops(opcode_id: &OpcodeId) -> FnGenAssociatedOps {
         OpcodeId::MLOAD => Mload::gen_associated_ops,
         OpcodeId::MSTORE => Mstore::<false>::gen_associated_ops,
         OpcodeId::MSTORE8 => Mstore::<true>::gen_associated_ops,
-        OpcodeId::SLOAD => Sload::gen_associated_ops,
-        OpcodeId::SSTORE => Sstore::gen_associated_ops,
         OpcodeId::JUMP => StackOnlyOpcode::<1, 0>::gen_associated_ops,
         OpcodeId::JUMPI => StackOnlyOpcode::<2, 0>::gen_associated_ops,
         OpcodeId::PC => StackOnlyOpcode::<0, 1>::gen_associated_ops,
@@ -265,11 +256,6 @@ fn fn_gen_associated_ops(opcode_id: &OpcodeId) -> FnGenAssociatedOps {
         OpcodeId::SWAP14 => Swap::<14>::gen_associated_ops,
         OpcodeId::SWAP15 => Swap::<15>::gen_associated_ops,
         OpcodeId::SWAP16 => Swap::<16>::gen_associated_ops,
-        OpcodeId::LOG0 => Log::gen_associated_ops,
-        OpcodeId::LOG1 => Log::gen_associated_ops,
-        OpcodeId::LOG2 => Log::gen_associated_ops,
-        OpcodeId::LOG3 => Log::gen_associated_ops,
-        OpcodeId::LOG4 => Log::gen_associated_ops,
         OpcodeId::CALL | OpcodeId::CALLCODE => CallOpcode::<7>::gen_associated_ops,
         OpcodeId::DELEGATECALL | OpcodeId::STATICCALL => CallOpcode::<6>::gen_associated_ops,
         OpcodeId::CREATE => Create::<false>::gen_associated_ops,
@@ -314,7 +300,6 @@ fn fn_gen_error_state_associated_ops(
             OpcodeId::CREATE2 => Some(StackOnlyOpcode::<4, 0, true>::gen_associated_ops),
             op => unreachable!("OOG Create cannot occur in {op}"),
         },
-        ExecError::OutOfGas(OogError::Log) => Some(ErrorOOGLog::gen_associated_ops),
         ExecError::OutOfGas(OogError::DynamicMemoryExpansion) => {
             Some(StackOnlyOpcode::<2, 0, true>::gen_associated_ops)
         }
@@ -328,7 +313,6 @@ fn fn_gen_error_state_associated_ops(
         ExecError::OutOfGas(OogError::Sha3) => {
             Some(StackOnlyOpcode::<2, 0, true>::gen_associated_ops)
         }
-        ExecError::OutOfGas(OogError::SloadSstore) => Some(OOGSloadSstore::gen_associated_ops),
         ExecError::OutOfGas(OogError::AccountAccess) => {
             Some(ErrorOOGAccountAccess::gen_associated_ops)
         }

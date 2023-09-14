@@ -588,13 +588,6 @@ impl<'a> CircuitInputBuilder {
                             "".to_string()
                         }
                     )
-                } else if matches!(geth_step.op, OpcodeId::SSTORE) {
-                    format!(
-                        "{:?} {:?} {:?}",
-                        state_ref.call().map(|c| c.address),
-                        geth_step.stack.nth_last(0),
-                        geth_step.stack.nth_last(1),
-                    )
                 } else {
                     let stack_input_num = 1024 - geth_step.op.valid_stack_ptr_range().1 as usize;
                     (0..stack_input_num).into_iter().map(|i|

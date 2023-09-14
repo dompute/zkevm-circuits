@@ -82,22 +82,9 @@ pub(crate) fn bytecode_prefix_op_big_rws(opcode: OpcodeId) -> Bytecode {
                 PUSH2(0x00) // destOffset
             }
         }
-        OpcodeId::LOG0
-        | OpcodeId::LOG1
-        | OpcodeId::LOG2
-        | OpcodeId::LOG3
-        | OpcodeId::LOG4
-        | OpcodeId::SHA3
-        | OpcodeId::RETURN
-        | OpcodeId::REVERT => bytecode! {
+        OpcodeId::SHA3 | OpcodeId::RETURN | OpcodeId::REVERT => bytecode! {
             PUSH4(0x1000) // size
             PUSH2(0x00) // offset
-        },
-        OpcodeId::EXTCODECOPY => bytecode! {
-            PUSH4(0x1000) // size
-            PUSH2(0x00) // offset
-            PUSH2(0x00) // destOffset
-            PUSH2(0x00) // address
         },
         _ => bytecode! {
             PUSH2(0x40)
@@ -171,7 +158,6 @@ pub(crate) fn print_circuit_stats_by_states(
             let opcode = responsible_op.opcode();
             let mut code = bytecode! {
                 PUSH2(0x00)
-                EXTCODESIZE // Warm up 0x0 address
                 PUSH1(0x00)
                 PUSH1(0x00)
                 PUSH1(0x00)

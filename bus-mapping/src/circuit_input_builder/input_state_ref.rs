@@ -1532,15 +1532,9 @@ impl<'a> CircuitInputStateRef<'a> {
                     OpcodeId::JUMP | OpcodeId::JUMPI => Some(ExecError::InvalidJump),
                     OpcodeId::RETURNDATACOPY => Some(ExecError::ReturnDataOutOfBounds),
                     // Break write protection (CALL with value will be handled below)
-                    OpcodeId::SSTORE
                     | OpcodeId::CREATE
                     | OpcodeId::CREATE2
                     | OpcodeId::SELFDESTRUCT
-                    | OpcodeId::LOG0
-                    | OpcodeId::LOG1
-                    | OpcodeId::LOG2
-                    | OpcodeId::LOG3
-                    | OpcodeId::LOG4
                         if call.is_static =>
                     {
                         Some(ExecError::WriteProtection)

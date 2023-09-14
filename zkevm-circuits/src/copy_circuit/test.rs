@@ -191,7 +191,7 @@ fn gen_extcodecopy_data() -> CircuitInputBuilder {
         PUSH1(0x0usize)
         PUSH1(0x0usize)
         PUSH20(external_address.to_word())
-        EXTCODECOPY
+        // EXTCODECOPY
         STOP
     };
     let code_ext = rand_bytes(0x0fffusize);
@@ -247,7 +247,7 @@ fn gen_tx_log_data() -> CircuitInputBuilder {
         PUSH32(Word::MAX)   // topic
         PUSH1(32)           // length
         PUSH1(0x20)         // offset
-        LOG0
+        // LOG0
         STOP
     };
     let test_ctx = TestContext::<2, 1>::simple_ctx_with_bytecode(code).unwrap();

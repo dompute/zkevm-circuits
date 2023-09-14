@@ -43,7 +43,6 @@ pub(crate) struct ErrorOOGMemoryCopyGadget<F> {
     memory_expansion: MemoryExpansionGadget<F, 1, N_BYTES_MEMORY_WORD_SIZE>,
     memory_copier_gas: MemoryCopierGasGadget<F, { GasCost::COPY }>,
     insufficient_gas: LtGadget<F, N_BYTES_GAS>,
-    is_extcodecopy: IsZeroGadget<F>,
     common_error_gadget: CommonErrorGadget<F>,
 }
 
@@ -60,7 +59,6 @@ impl<F: Field> ExecutionGadget<F> for ErrorOOGMemoryCopyGadget<F> {
             vec![
                 OpcodeId::CALLDATACOPY.expr(),
                 OpcodeId::CODECOPY.expr(),
-                OpcodeId::EXTCODECOPY.expr(),
                 OpcodeId::RETURNDATACOPY.expr(),
             ],
         );
@@ -70,8 +68,7 @@ impl<F: Field> ExecutionGadget<F> for ErrorOOGMemoryCopyGadget<F> {
         let is_warm = cb.query_bool();
         let tx_id = cb.query_cell();
 
-        let is_extcodecopy =
-            IsZeroGadget::construct(cb, opcode.expr() - OpcodeId::EXTCODECOPY.expr());
+        let is_extcodecopy = false;
 
         cb.condition(is_extcodecopy.expr(), |cb| {
             cb.call_context_lookup(false.expr(), None, CallContextFieldTag::TxId, tx_id.expr());
@@ -143,7 +140,6 @@ impl<F: Field> ExecutionGadget<F> for ErrorOOGMemoryCopyGadget<F> {
             memory_expansion,
             memory_copier_gas,
             insufficient_gas,
-            is_extcodecopy,
             common_error_gadget,
         }
     }
@@ -158,7 +154,7 @@ impl<F: Field> ExecutionGadget<F> for ErrorOOGMemoryCopyGadget<F> {
         step: &ExecStep,
     ) -> Result<(), Error> {
         let opcode = step.opcode.unwrap();
-        let is_extcodecopy = opcode == OpcodeId::EXTCODECOPY;
+        let is_extcodecopy = false;
 
         log::debug!(
             "ErrorOutOfGasMemoryCopy: opcode = {}, gas_left = {}, gas_cost = {}",
@@ -217,11 +213,11 @@ impl<F: Field> ExecutionGadget<F> for ErrorOOGMemoryCopyGadget<F> {
             Value::known(F::from(step.gas_left)),
             Value::known(F::from(memory_copier_gas + constant_gas_cost.0)),
         )?;
-        self.is_extcodecopy.assign(
-            region,
-            offset,
-            F::from(opcode.as_u64()) - F::from(OpcodeId::EXTCODECOPY.as_u64()),
-        )?;
+        // self.is_extcodecopy.assign(
+        //     region,
+        //     offset,
+        //     F::from(opcode.as_u64()) - F::from(OpcodeId::EXTCODECOPY.as_u64()),
+        // )?;
         self.common_error_gadget.assign(
             region,
             offset,
@@ -346,7 +342,6 @@ mod tests {
                 PUSH32(U256::zero())
                 PUSH32(dst_offset)
                 PUSH32(external_address.to_word())
-                EXTCODECOPY
             };
 
             if is_warm {
@@ -355,7 +350,6 @@ mod tests {
                     PUSH32(rand_word())
                     PUSH32(dst_offset)
                     PUSH32(external_address.to_word())
-                    EXTCODECOPY
                 });
             }
 

@@ -19,13 +19,13 @@ impl Opcode for ErrorOOGAccountAccess {
         let mut exec_step = state.new_step(geth_step)?;
         exec_step.error = Some(ExecError::OutOfGas(OogError::AccountAccess));
 
-        // assert op code is BALANCE | EXTCODESIZE | EXTCODEHASH
-        assert!([
-            OpcodeId::BALANCE,
-            OpcodeId::EXTCODESIZE,
-            OpcodeId::EXTCODEHASH
-        ]
-        .contains(&geth_step.op));
+        // // assert op code is BALANCE | EXTCODESIZE | EXTCODEHASH
+        // assert!([
+        //     OpcodeId::BALANCE,
+        //     OpcodeId::EXTCODESIZE,
+        //     OpcodeId::EXTCODEHASH
+        // ]
+        // .contains(&geth_step.op));
         // Read account address from stack.
         let address_word = geth_step.stack.last()?;
         let address = address_word.to_address();
@@ -73,103 +73,103 @@ mod oog_account_access_tests {
     use mock::TestContext;
     use pretty_assertions::assert_eq;
 
-    #[test]
-    fn test_balance_of_warm_address() {
-        test_ok(true, false);
-        test_ok(false, false);
-        test_ok(true, true);
-    }
+    // #[test]
+    // fn test_balance_of_warm_address() {
+    //     test_ok(true, false);
+    //     test_ok(false, false);
+    //     test_ok(true, true);
+    // }
 
-    // test balance opcode as an example
-    fn test_ok(exists: bool, is_warm: bool) {
-        let address = address!("0xaabbccddee000000000000000000000000000000");
+    // // test balance opcode as an example
+    // fn test_ok(exists: bool, is_warm: bool) {
+    //     let address = address!("0xaabbccddee000000000000000000000000000000");
 
-        // Pop balance first for warm account.
-        let mut code = Bytecode::default();
-        if is_warm {
-            code.append(&bytecode! {
-                PUSH20(address.to_word())
-                BALANCE
-                POP
-            });
-        }
-        code.append(&bytecode! {
-            PUSH20(address.to_word())
-            BALANCE
-            STOP
-        });
+    //     // Pop balance first for warm account.
+    //     let mut code = Bytecode::default();
+    //     if is_warm {
+    //         code.append(&bytecode! {
+    //             PUSH20(address.to_word())
+    //             BALANCE
+    //             POP
+    //         });
+    //     }
+    //     code.append(&bytecode! {
+    //         PUSH20(address.to_word())
+    //         BALANCE
+    //         STOP
+    //     });
 
-        let balance = if exists {
-            Word::from(800u64)
-        } else {
-            Word::zero()
-        };
+    //     let balance = if exists {
+    //         Word::from(800u64)
+    //     } else {
+    //         Word::zero()
+    //     };
 
-        // Get the execution steps from the external tracer.
-        let block: GethData = TestContext::<3, 1>::new(
-            None,
-            |accs| {
-                accs[0]
-                    .address(address!("0x0000000000000000000000000000000000000010"))
-                    .balance(Word::from(1u64 << 20))
-                    .code(code.clone());
-                if exists {
-                    accs[1].address(address).balance(balance);
-                } else {
-                    accs[1]
-                        .address(address!("0x0000000000000000000000000000000000000020"))
-                        .balance(Word::from(1u64 << 20));
-                }
-                accs[2]
-                    .address(address!("0x0000000000000000000000000000000000cafe01"))
-                    .balance(Word::from(1u64 << 20));
-            },
-            |mut txs, accs| {
-                txs[0]
-                    .to(accs[0].address)
-                    .from(accs[2].address)
-                    .gas(21005.into());
-            },
-            |block, _tx| block.number(0xcafeu64),
-        )
-        .unwrap()
-        .into();
+    //     // Get the execution steps from the external tracer.
+    //     let block: GethData = TestContext::<3, 1>::new(
+    //         None,
+    //         |accs| {
+    //             accs[0]
+    //                 .address(address!("0x0000000000000000000000000000000000000010"))
+    //                 .balance(Word::from(1u64 << 20))
+    //                 .code(code.clone());
+    //             if exists {
+    //                 accs[1].address(address).balance(balance);
+    //             } else {
+    //                 accs[1]
+    //                     .address(address!("0x0000000000000000000000000000000000000020"))
+    //                     .balance(Word::from(1u64 << 20));
+    //             }
+    //             accs[2]
+    //                 .address(address!("0x0000000000000000000000000000000000cafe01"))
+    //                 .balance(Word::from(1u64 << 20));
+    //         },
+    //         |mut txs, accs| {
+    //             txs[0]
+    //                 .to(accs[0].address)
+    //                 .from(accs[2].address)
+    //                 .gas(21005.into());
+    //         },
+    //         |block, _tx| block.number(0xcafeu64),
+    //     )
+    //     .unwrap()
+    //     .into();
 
-        let mut builder = BlockData::new_from_geth_data(block.clone()).new_circuit_input_builder();
-        builder
-            .handle_block(&block.eth_block, &block.geth_traces)
-            .unwrap();
+    //     let mut builder = BlockData::new_from_geth_data(block.clone()).new_circuit_input_builder();
+    //     builder
+    //         .handle_block(&block.eth_block, &block.geth_traces)
+    //         .unwrap();
 
-        // Check if account address is in access list as a result of bus mapping.
-        assert!(builder.sdb.add_account_to_access_list(address));
+    //     // Check if account address is in access list as a result of bus mapping.
+    //     assert!(builder.sdb.add_account_to_access_list(address));
 
-        let tx_id = 1;
-        let transaction = &builder.block.txs()[tx_id - 1];
-        let call_id = transaction.calls()[0].call_id;
+    //     let tx_id = 1;
+    //     let transaction = &builder.block.txs()[tx_id - 1];
+    //     let call_id = transaction.calls()[0].call_id;
 
-        let step = transaction
-            .steps()
-            .iter()
-            .filter(|step| step.exec_state == ExecState::Op(OpcodeId::BALANCE))
-            .last()
-            .unwrap();
+    //     let step = transaction
+    //         .steps()
+    //         .iter()
+    //         .filter(|step| step.exec_state == ExecState::Op(OpcodeId::BALANCE))
+    //         .last()
+    //         .unwrap();
 
-        // check expected error occurs
-        assert_eq!(
-            step.error,
-            Some(ExecError::OutOfGas(OogError::AccountAccess))
-        );
+    //     // check expected error occurs
+    //     assert_eq!(
+    //         step.error,
+    //         Some(ExecError::OutOfGas(OogError::AccountAccess))
+    //     );
 
-        let container = builder.block.container.clone();
-        let operation = &container.stack[step.bus_mapping_instance[0].as_usize()];
-        assert_eq!(operation.rw(), RW::READ);
-        assert_eq!(
-            operation.op(),
-            &StackOp {
-                call_id,
-                address: 1023.into(),
-                value: address.to_word(),
-            }
-        );
-    }
+    //     let container = builder.block.container.clone();
+    //     let operation = &container.stack[step.bus_mapping_instance[0].as_usize()];
+    //     assert_eq!(operation.rw(), RW::READ);
+    //     assert_eq!(
+    //         operation.op(),
+    //         &StackOp {
+    //             call_id,
+    //             address: 1023.into(),
+    //             value: address.to_word(),
+    //         }
+    //     );
+    // }
 }

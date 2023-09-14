@@ -48,15 +48,9 @@ impl<F: Field> ExecutionGadget<F> for ErrorWriteProtectionGadget<F> {
             opcode.expr(),
             vec![
                 OpcodeId::CALL.expr(),
-                OpcodeId::SSTORE.expr(),
                 OpcodeId::CREATE.expr(),
                 OpcodeId::CREATE2.expr(),
                 OpcodeId::SELFDESTRUCT.expr(),
-                OpcodeId::LOG0.expr(),
-                OpcodeId::LOG1.expr(),
-                OpcodeId::LOG2.expr(),
-                OpcodeId::LOG3.expr(),
-                OpcodeId::LOG4.expr(),
             ],
         );
 
@@ -263,7 +257,7 @@ mod test {
         } else {
             callee_bytecode.append(&bytecode! {
                 // this SSTORE got error: ErrorWriteProtection
-                SSTORE
+                // SSTORE
                 STOP
             });
         }

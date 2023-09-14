@@ -109,12 +109,10 @@ impl From<&ExecError> for ExecutionState {
                 OogError::MemoryCopy => ExecutionState::ErrorOutOfGasMemoryCopy,
                 OogError::AccountAccess => ExecutionState::ErrorOutOfGasAccountAccess,
                 OogError::CodeStore => ExecutionState::ErrorCodeStore,
-                OogError::Log => ExecutionState::ErrorOutOfGasLOG,
                 OogError::Exp => ExecutionState::ErrorOutOfGasEXP,
                 OogError::Sha3 => ExecutionState::ErrorOutOfGasSHA3,
                 OogError::Call => ExecutionState::ErrorOutOfGasCall,
                 OogError::Precompile => ExecutionState::ErrorOutOfGasPrecompile,
-                OogError::SloadSstore => ExecutionState::ErrorOutOfGasSloadSstore,
                 OogError::Create => ExecutionState::ErrorOutOfGasCREATE,
                 OogError::SelfDestruct => ExecutionState::ErrorOutOfGasSELFDESTRUCT,
             },
@@ -139,9 +137,6 @@ impl From<&circuit_input_builder::ExecStep> for ExecutionState {
                 if op.is_swap() {
                     return ExecutionState::SWAP;
                 }
-                if op.is_log() {
-                    return ExecutionState::LOG;
-                }
 
                 macro_rules! dummy {
                     ($name:expr) => {{
@@ -154,7 +149,6 @@ impl From<&circuit_input_builder::ExecStep> for ExecutionState {
                     OpcodeId::ADD | OpcodeId::SUB => ExecutionState::ADD_SUB,
                     OpcodeId::ADDMOD => ExecutionState::ADDMOD,
                     OpcodeId::ADDRESS => ExecutionState::ADDRESS,
-                    OpcodeId::BALANCE => ExecutionState::BALANCE,
                     OpcodeId::MUL | OpcodeId::DIV | OpcodeId::MOD => ExecutionState::MUL_DIV_MOD,
                     OpcodeId::MULMOD => ExecutionState::MULMOD,
                     OpcodeId::SDIV | OpcodeId::SMOD => ExecutionState::SDIV_SMOD,
@@ -175,14 +169,10 @@ impl From<&circuit_input_builder::ExecStep> for ExecutionState {
                     OpcodeId::JUMPDEST => ExecutionState::JUMPDEST,
                     OpcodeId::JUMP => ExecutionState::JUMP,
                     OpcodeId::JUMPI => ExecutionState::JUMPI,
-                    OpcodeId::GASPRICE => ExecutionState::GASPRICE,
                     OpcodeId::PC => ExecutionState::PC,
                     OpcodeId::MSIZE => ExecutionState::MSIZE,
                     OpcodeId::CALLER => ExecutionState::CALLER,
                     OpcodeId::CALLVALUE => ExecutionState::CALLVALUE,
-                    OpcodeId::EXTCODEHASH => ExecutionState::EXTCODEHASH,
-                    OpcodeId::EXTCODESIZE => ExecutionState::EXTCODESIZE,
-                    OpcodeId::BLOCKHASH => ExecutionState::BLOCKHASH,
                     OpcodeId::TIMESTAMP | OpcodeId::NUMBER | OpcodeId::GASLIMIT => {
                         ExecutionState::BLOCKCTXU64
                     }
@@ -193,21 +183,16 @@ impl From<&circuit_input_builder::ExecStep> for ExecutionState {
                     OpcodeId::SELFBALANCE => ExecutionState::SELFBALANCE,
                     OpcodeId::SHA3 => ExecutionState::SHA3,
                     OpcodeId::SHL | OpcodeId::SHR => ExecutionState::SHL_SHR,
-                    OpcodeId::SLOAD => ExecutionState::SLOAD,
-                    OpcodeId::SSTORE => ExecutionState::SSTORE,
                     OpcodeId::CALLDATASIZE => ExecutionState::CALLDATASIZE,
                     OpcodeId::CALLDATACOPY => ExecutionState::CALLDATACOPY,
-                    OpcodeId::CHAINID => ExecutionState::CHAINID,
                     OpcodeId::ISZERO => ExecutionState::ISZERO,
                     OpcodeId::CALL
                     | OpcodeId::CALLCODE
                     | OpcodeId::DELEGATECALL
                     | OpcodeId::STATICCALL => ExecutionState::CALL_OP,
-                    OpcodeId::ORIGIN => ExecutionState::ORIGIN,
                     OpcodeId::CODECOPY => ExecutionState::CODECOPY,
                     OpcodeId::CALLDATALOAD => ExecutionState::CALLDATALOAD,
                     OpcodeId::CODESIZE => ExecutionState::CODESIZE,
-                    OpcodeId::EXTCODECOPY => ExecutionState::EXTCODECOPY,
                     OpcodeId::RETURN | OpcodeId::REVERT => ExecutionState::RETURN_REVERT,
                     OpcodeId::RETURNDATASIZE => ExecutionState::RETURNDATASIZE,
                     OpcodeId::RETURNDATACOPY => ExecutionState::RETURNDATACOPY,

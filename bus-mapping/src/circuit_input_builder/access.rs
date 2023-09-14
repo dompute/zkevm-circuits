@@ -154,16 +154,16 @@ pub fn gen_state_access_trace<TX>(
 
         let result: Result<(), Error> = (|| {
             match step.op {
-                OpcodeId::SSTORE => {
-                    let address = contract_address;
-                    let key = step.stack.nth_last(0)?;
-                    accs.push(Access::new(i, WRITE, Storage { address, key }));
-                }
-                OpcodeId::SLOAD => {
-                    let address = contract_address;
-                    let key = step.stack.nth_last(0)?;
-                    accs.push(Access::new(i, READ, Storage { address, key }));
-                }
+                // OpcodeId::SSTORE => {
+                //     let address = contract_address;
+                //     let key = step.stack.nth_last(0)?;
+                //     accs.push(Access::new(i, WRITE, Storage { address, key }));
+                // }
+                // OpcodeId::SLOAD => {
+                //     let address = contract_address;
+                //     let key = step.stack.nth_last(0)?;
+                //     accs.push(Access::new(i, READ, Storage { address, key }));
+                // }
                 OpcodeId::SELFBALANCE => {
                     let address = contract_address;
                     accs.push(Access::new(i, READ, Account { address }));
@@ -178,22 +178,22 @@ pub fn gen_state_access_trace<TX>(
                         accs.push(Access::new(i, READ, Code { address }));
                     }
                 }
-                OpcodeId::BALANCE => {
-                    let address = step.stack.nth_last(0)?.to_address();
-                    accs.push(Access::new(i, READ, Account { address }));
-                }
-                OpcodeId::EXTCODEHASH => {
-                    let address = step.stack.nth_last(0)?.to_address();
-                    accs.push(Access::new(i, READ, Account { address }));
-                }
-                OpcodeId::EXTCODESIZE => {
-                    let address = step.stack.nth_last(0)?.to_address();
-                    accs.push(Access::new(i, READ, Code { address }));
-                }
-                OpcodeId::EXTCODECOPY => {
-                    let address = step.stack.nth_last(0)?.to_address();
-                    accs.push(Access::new(i, READ, Code { address }));
-                }
+                // OpcodeId::BALANCE => {
+                //     let address = step.stack.nth_last(0)?.to_address();
+                //     accs.push(Access::new(i, READ, Account { address }));
+                // }
+                // OpcodeId::EXTCODEHASH => {
+                //     let address = step.stack.nth_last(0)?.to_address();
+                //     accs.push(Access::new(i, READ, Account { address }));
+                // }
+                // OpcodeId::EXTCODESIZE => {
+                //     let address = step.stack.nth_last(0)?.to_address();
+                //     accs.push(Access::new(i, READ, Code { address }));
+                // }
+                // OpcodeId::EXTCODECOPY => {
+                //     let address = step.stack.nth_last(0)?.to_address();
+                //     accs.push(Access::new(i, READ, Code { address }));
+                // }
                 OpcodeId::SELFDESTRUCT => {
                     let address = contract_address;
                     accs.push(Access::new(i, WRITE, Account { address }));

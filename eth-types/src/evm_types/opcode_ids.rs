@@ -244,27 +244,27 @@ pub enum OpcodeId {
     /// `ADDRESS`
     ADDRESS,
     /// `BALANCE`
-    BALANCE,
+    // BALANCE,
     /// `ORIGIN`
-    ORIGIN,
+    // ORIGIN,
     /// `CALLER`
     CALLER,
     /// `CALLVALUE`
     CALLVALUE,
     /// `GASPRICE`
-    GASPRICE,
+    // GASPRICE,
     /// `EXTCODESIZE`
-    EXTCODESIZE,
+    // EXTCODESIZE,
     /// `EXTCODECOPY`
-    EXTCODECOPY,
+    // EXTCODECOPY,
     /// `EXTCODEHASH`
-    EXTCODEHASH,
+    // EXTCODEHASH,
     /// `RETURNDATASIZE`
     RETURNDATASIZE,
     /// `RETURNDATACOPY`
     RETURNDATACOPY,
     /// `BLOCKHASH`
-    BLOCKHASH,
+    // BLOCKHASH,
     /// `COINBASE`
     COINBASE,
     /// `TIMESTAMP`
@@ -282,23 +282,23 @@ pub enum OpcodeId {
     /// `BASEFEE`
     BASEFEE,
     /// `SLOAD`
-    SLOAD,
+    // SLOAD,
     /// `SSTORE`
-    SSTORE,
+    // SSTORE,
     /// `GAS`
     GAS,
 
-    // LOGn
-    /// `LOG0`
-    LOG0,
-    /// `LOG1`
-    LOG1,
-    /// `LOG2`
-    LOG2,
-    /// `LOG3`
-    LOG3,
-    /// `LOG4`
-    LOG4,
+    // // LOGn
+    // /// `LOG0`
+    // LOG0,
+    // /// `LOG1`
+    // LOG1,
+    // /// `LOG2`
+    // LOG2,
+    // /// `LOG3`
+    // LOG3,
+    // /// `LOG4`
+    // LOG4,
 
     /// `CREATE`
     CREATE,
@@ -353,10 +353,10 @@ impl OpcodeId {
         self.as_u8() >= Self::SWAP1.as_u8() && self.as_u8() <= Self::SWAP16.as_u8()
     }
 
-    /// Returns `true` if the `OpcodeId` is a `LOGn`.
-    pub fn is_log(&self) -> bool {
-        self.as_u8() >= Self::LOG0.as_u8() && self.as_u8() <= Self::LOG4.as_u8()
-    }
+    // /// Returns `true` if the `OpcodeId` is a `LOGn`.
+    // pub fn is_log(&self) -> bool {
+    //     self.as_u8() >= Self::LOG0.as_u8() && self.as_u8() <= Self::LOG4.as_u8()
+    // }
 
     /// Returns `true` if the `OpcodeId` is a CALL-like.
     pub fn is_call(&self) -> bool {
@@ -495,17 +495,10 @@ impl OpcodeId {
             OpcodeId::INVALID(b) => *b,
             OpcodeId::SHA3 => 0x20u8,
             OpcodeId::ADDRESS => 0x30u8,
-            OpcodeId::BALANCE => 0x31u8,
-            OpcodeId::ORIGIN => 0x32u8,
             OpcodeId::CALLER => 0x33u8,
             OpcodeId::CALLVALUE => 0x34u8,
-            OpcodeId::GASPRICE => 0x3au8,
-            OpcodeId::EXTCODESIZE => 0x3bu8,
-            OpcodeId::EXTCODECOPY => 0x3cu8,
-            OpcodeId::EXTCODEHASH => 0x3fu8,
             OpcodeId::RETURNDATASIZE => 0x3du8,
             OpcodeId::RETURNDATACOPY => 0x3eu8,
-            OpcodeId::BLOCKHASH => 0x40u8,
             OpcodeId::COINBASE => 0x41u8,
             OpcodeId::TIMESTAMP => 0x42u8,
             OpcodeId::NUMBER => 0x43u8,
@@ -514,14 +507,7 @@ impl OpcodeId {
             OpcodeId::CHAINID => 0x46u8,
             OpcodeId::SELFBALANCE => 0x47u8,
             OpcodeId::BASEFEE => 0x48u8,
-            OpcodeId::SLOAD => 0x54u8,
-            OpcodeId::SSTORE => 0x55u8,
             OpcodeId::GAS => 0x5au8,
-            OpcodeId::LOG0 => 0xa0u8,
-            OpcodeId::LOG1 => 0xa1u8,
-            OpcodeId::LOG2 => 0xa2u8,
-            OpcodeId::LOG3 => 0xa3u8,
-            OpcodeId::LOG4 => 0xa4u8,
             OpcodeId::CREATE => 0xf0u8,
             OpcodeId::CREATE2 => 0xf5u8,
             OpcodeId::CALL => 0xf1u8,
@@ -568,8 +554,6 @@ impl OpcodeId {
             OpcodeId::SAR => GasCost::FASTEST,
             OpcodeId::SHA3 => GasCost::SHA3,
             OpcodeId::ADDRESS => GasCost::QUICK,
-            OpcodeId::BALANCE => GasCost::WARM_ACCESS,
-            OpcodeId::ORIGIN => GasCost::QUICK,
             OpcodeId::CALLER => GasCost::QUICK,
             OpcodeId::CALLVALUE => GasCost::QUICK,
             OpcodeId::CALLDATALOAD => GasCost::FASTEST,
@@ -577,13 +561,8 @@ impl OpcodeId {
             OpcodeId::CALLDATACOPY => GasCost::FASTEST,
             OpcodeId::CODESIZE => GasCost::QUICK,
             OpcodeId::CODECOPY => GasCost::FASTEST,
-            OpcodeId::GASPRICE => GasCost::QUICK,
-            OpcodeId::EXTCODESIZE => GasCost::WARM_ACCESS,
-            OpcodeId::EXTCODECOPY => GasCost::WARM_ACCESS,
             OpcodeId::RETURNDATASIZE => GasCost::QUICK,
             OpcodeId::RETURNDATACOPY => GasCost::FASTEST,
-            OpcodeId::EXTCODEHASH => GasCost::WARM_ACCESS,
-            OpcodeId::BLOCKHASH => GasCost::EXT,
             OpcodeId::COINBASE => GasCost::QUICK,
             OpcodeId::TIMESTAMP => GasCost::QUICK,
             OpcodeId::NUMBER => GasCost::QUICK,
@@ -596,8 +575,6 @@ impl OpcodeId {
             OpcodeId::MLOAD => GasCost::FASTEST,
             OpcodeId::MSTORE => GasCost::FASTEST,
             OpcodeId::MSTORE8 => GasCost::FASTEST,
-            OpcodeId::SLOAD => GasCost::ZERO,
-            OpcodeId::SSTORE => GasCost::ZERO,
             OpcodeId::JUMP => GasCost::MID,
             OpcodeId::JUMPI => GasCost::SLOW,
             OpcodeId::PC => GasCost::QUICK,
@@ -669,11 +646,6 @@ impl OpcodeId {
             OpcodeId::SWAP14 => GasCost::FASTEST,
             OpcodeId::SWAP15 => GasCost::FASTEST,
             OpcodeId::SWAP16 => GasCost::FASTEST,
-            OpcodeId::LOG0 => GasCost::ZERO,
-            OpcodeId::LOG1 => GasCost::ZERO,
-            OpcodeId::LOG2 => GasCost::ZERO,
-            OpcodeId::LOG3 => GasCost::ZERO,
-            OpcodeId::LOG4 => GasCost::ZERO,
             OpcodeId::CREATE => GasCost::CREATE,
             OpcodeId::CALL => GasCost::WARM_ACCESS,
             OpcodeId::CALLCODE => GasCost::WARM_ACCESS,
@@ -732,8 +704,6 @@ impl OpcodeId {
             OpcodeId::SAR => (0, 1022),
             OpcodeId::SHA3 => (0, 1022),
             OpcodeId::ADDRESS => (1, 1024),
-            OpcodeId::BALANCE => (0, 1023),
-            OpcodeId::ORIGIN => (1, 1024),
             OpcodeId::CALLER => (1, 1024),
             OpcodeId::CALLVALUE => (1, 1024),
             OpcodeId::CALLDATALOAD => (0, 1023),
@@ -741,13 +711,8 @@ impl OpcodeId {
             OpcodeId::CALLDATACOPY => (0, 1021),
             OpcodeId::CODESIZE => (1, 1024),
             OpcodeId::CODECOPY => (0, 1021),
-            OpcodeId::GASPRICE => (1, 1024),
-            OpcodeId::EXTCODESIZE => (0, 1023),
-            OpcodeId::EXTCODECOPY => (0, 1020),
             OpcodeId::RETURNDATASIZE => (1, 1024),
             OpcodeId::RETURNDATACOPY => (0, 1021),
-            OpcodeId::EXTCODEHASH => (0, 1023),
-            OpcodeId::BLOCKHASH => (0, 1023),
             OpcodeId::COINBASE => (1, 1024),
             OpcodeId::TIMESTAMP => (1, 1024),
             OpcodeId::NUMBER => (1, 1024),
@@ -760,8 +725,6 @@ impl OpcodeId {
             OpcodeId::MLOAD => (0, 1023),
             OpcodeId::MSTORE => (0, 1022),
             OpcodeId::MSTORE8 => (0, 1022),
-            OpcodeId::SLOAD => (0, 1023),
-            OpcodeId::SSTORE => (0, 1022),
             OpcodeId::JUMP => (0, 1023),
             OpcodeId::JUMPI => (0, 1022),
             OpcodeId::PC => (1, 1024),
@@ -834,11 +797,6 @@ impl OpcodeId {
             OpcodeId::SWAP14 => (0, 1009),
             OpcodeId::SWAP15 => (0, 1008),
             OpcodeId::SWAP16 => (0, 1007),
-            OpcodeId::LOG0 => (0, 1022),
-            OpcodeId::LOG1 => (0, 1021),
-            OpcodeId::LOG2 => (0, 1020),
-            OpcodeId::LOG3 => (0, 1019),
-            OpcodeId::LOG4 => (0, 1018),
             OpcodeId::CREATE => (0, 1021),
             OpcodeId::CALL => (0, 1017),
             OpcodeId::CALLCODE => (0, 1017),
@@ -865,7 +823,6 @@ impl OpcodeId {
                 | OpcodeId::CALLDATACOPY
                 | OpcodeId::RETURNDATACOPY
                 | OpcodeId::CODECOPY
-                | OpcodeId::EXTCODECOPY
         )
     }
 
@@ -888,8 +845,6 @@ impl OpcodeId {
             Some(self.as_u8() - OpcodeId::DUP1.as_u8() + 1)
         } else if self.is_swap() {
             Some(self.as_u8() - OpcodeId::SWAP1.as_u8() + 1)
-        } else if self.is_log() {
-            Some(self.as_u8() - OpcodeId::LOG0.as_u8())
         } else {
             None
         }
@@ -1040,17 +995,10 @@ impl From<u8> for OpcodeId {
             0xfeu8 => OpcodeId::INVALID(value),
             0x20u8 => OpcodeId::SHA3,
             0x30u8 => OpcodeId::ADDRESS,
-            0x31u8 => OpcodeId::BALANCE,
-            0x32u8 => OpcodeId::ORIGIN,
             0x33u8 => OpcodeId::CALLER,
             0x34u8 => OpcodeId::CALLVALUE,
-            0x3au8 => OpcodeId::GASPRICE,
-            0x3bu8 => OpcodeId::EXTCODESIZE,
-            0x3cu8 => OpcodeId::EXTCODECOPY,
-            0x3fu8 => OpcodeId::EXTCODEHASH,
             0x3du8 => OpcodeId::RETURNDATASIZE,
             0x3eu8 => OpcodeId::RETURNDATACOPY,
-            0x40u8 => OpcodeId::BLOCKHASH,
             0x41u8 => OpcodeId::COINBASE,
             0x42u8 => OpcodeId::TIMESTAMP,
             0x43u8 => OpcodeId::NUMBER,
@@ -1060,14 +1008,7 @@ impl From<u8> for OpcodeId {
             0x47u8 => OpcodeId::SELFBALANCE,
             #[cfg(not(feature = "scroll"))]
             0x48u8 => OpcodeId::BASEFEE,
-            0x54u8 => OpcodeId::SLOAD,
-            0x55u8 => OpcodeId::SSTORE,
             0x5au8 => OpcodeId::GAS,
-            0xa0u8 => OpcodeId::LOG0,
-            0xa1u8 => OpcodeId::LOG1,
-            0xa2u8 => OpcodeId::LOG2,
-            0xa3u8 => OpcodeId::LOG3,
-            0xa4u8 => OpcodeId::LOG4,
             0xf0u8 => OpcodeId::CREATE,
             0xf5u8 => OpcodeId::CREATE2,
             0xf1u8 => OpcodeId::CALL,
@@ -1199,31 +1140,17 @@ impl FromStr for OpcodeId {
             "INVALID" => OpcodeId::INVALID(0xfe),
             "SHA3" | "KECCAK256" => OpcodeId::SHA3,
             "ADDRESS" => OpcodeId::ADDRESS,
-            "BALANCE" => OpcodeId::BALANCE,
             "SELFBALANCE" => OpcodeId::SELFBALANCE,
-            "ORIGIN" => OpcodeId::ORIGIN,
             "CALLER" => OpcodeId::CALLER,
             "CALLVALUE" => OpcodeId::CALLVALUE,
-            "GASPRICE" => OpcodeId::GASPRICE,
-            "EXTCODESIZE" => OpcodeId::EXTCODESIZE,
-            "EXTCODECOPY" => OpcodeId::EXTCODECOPY,
-            "EXTCODEHASH" => OpcodeId::EXTCODEHASH,
             "RETURNDATASIZE" => OpcodeId::RETURNDATASIZE,
             "RETURNDATACOPY" => OpcodeId::RETURNDATACOPY,
-            "BLOCKHASH" => OpcodeId::BLOCKHASH,
             "COINBASE" => OpcodeId::COINBASE,
             "TIMESTAMP" => OpcodeId::TIMESTAMP,
             "NUMBER" => OpcodeId::NUMBER,
             "DIFFICULTY" => OpcodeId::DIFFICULTY,
             "GASLIMIT" => OpcodeId::GASLIMIT,
-            "SLOAD" => OpcodeId::SLOAD,
-            "SSTORE" => OpcodeId::SSTORE,
             "GAS" => OpcodeId::GAS,
-            "LOG0" => OpcodeId::LOG0,
-            "LOG1" => OpcodeId::LOG1,
-            "LOG2" => OpcodeId::LOG2,
-            "LOG3" => OpcodeId::LOG3,
-            "LOG4" => OpcodeId::LOG4,
             "CREATE" => OpcodeId::CREATE,
             "CREATE2" => OpcodeId::CREATE2,
             "CALL" => OpcodeId::CALL,
@@ -1305,7 +1232,6 @@ mod opcode_ids_tests {
         assert_eq!(OpcodeId::PUSH0.postfix(), None);
         assert_eq!(OpcodeId::PUSH1.postfix(), Some(1));
         assert_eq!(OpcodeId::PUSH10.postfix(), Some(10));
-        assert_eq!(OpcodeId::LOG2.postfix(), Some(2));
         assert_eq!(OpcodeId::CALLCODE.postfix(), None);
     }
 
@@ -1314,7 +1240,6 @@ mod opcode_ids_tests {
         assert_eq!(OpcodeId::PUSH0.data_len(), 0);
         assert_eq!(OpcodeId::PUSH1.data_len(), 1);
         assert_eq!(OpcodeId::PUSH10.data_len(), 10);
-        assert_eq!(OpcodeId::LOG2.data_len(), 0);
         assert_eq!(OpcodeId::CALLCODE.data_len(), 0);
     }
 }

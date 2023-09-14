@@ -200,14 +200,6 @@ fn update_codedb(cdb: &mut CodeDB, sdb: &StateDB, block: &BlockTrace) -> Result<
                         // notice we do not need to insert code for CREATE,
                         // bustmapping do this job
                     }
-                    OpcodeId::EXTCODESIZE | OpcodeId::EXTCODECOPY => {
-                        let code = data.get_code_at(0);
-                        if code.is_none() {
-                            log::warn!("unable to fetch code from step. {step:?}");
-                            continue;
-                        }
-                        trace_code(cdb, None, code.unwrap(), step, sdb, 0);
-                    }
 
                     _ => {}
                 }

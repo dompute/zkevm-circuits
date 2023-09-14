@@ -40,15 +40,15 @@ impl<F: Field> ExecutionGadget<F> for ErrorOOGAccountAccessGadget<F> {
 
     fn configure(cb: &mut EVMConstraintBuilder<F>) -> Self {
         let opcode = cb.query_cell();
-        cb.require_in_set(
-            "ErrorOutOfGasAccountAccess happens for BALANCE | EXTCODESIZE | EXTCODEHASH ",
-            opcode.expr(),
-            vec![
-                OpcodeId::BALANCE.expr(),
-                OpcodeId::EXTCODESIZE.expr(),
-                OpcodeId::EXTCODEHASH.expr(),
-            ],
-        );
+        // cb.require_in_set(
+        //     "ErrorOutOfGasAccountAccess happens for BALANCE | EXTCODESIZE | EXTCODEHASH ",
+        //     opcode.expr(),
+        //     vec![
+        //         OpcodeId::BALANCE.expr(),
+        //         OpcodeId::EXTCODESIZE.expr(),
+        //         OpcodeId::EXTCODEHASH.expr(),
+        //     ],
+        // );
 
         let address_word = cb.query_word_rlc();
         let address = from_bytes::expr(&address_word.cells[..N_BYTES_ACCOUNT_ADDRESS]);

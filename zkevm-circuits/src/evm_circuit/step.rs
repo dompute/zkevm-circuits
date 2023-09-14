@@ -62,8 +62,8 @@ pub enum ExecutionState {
     SAR,
     SHA3,
     ADDRESS,
-    BALANCE,
-    ORIGIN,
+    // BALANCE,
+    // ORIGIN,
     CALLER,
     CALLVALUE,
     CALLDATALOAD,
@@ -71,22 +71,22 @@ pub enum ExecutionState {
     CALLDATACOPY,
     CODESIZE,
     CODECOPY,
-    GASPRICE,
-    EXTCODESIZE,
-    EXTCODECOPY,
+    // GASPRICE,
+    // EXTCODESIZE,
+    // EXTCODECOPY,
     RETURNDATASIZE,
     RETURNDATACOPY,
-    EXTCODEHASH,
-    BLOCKHASH,
+    // EXTCODEHASH,
+    // BLOCKHASH,
     BLOCKCTXU64,  // TIMESTAMP, NUMBER, GASLIMIT
     BLOCKCTXU160, // COINBASE
     BLOCKCTXU256, // DIFFICULTY, BASEFEE
-    CHAINID,
+    // CHAINID,
     SELFBALANCE,
     POP,
     MEMORY, // MLOAD, MSTORE, MSTORE8
-    SLOAD,
-    SSTORE,
+    // SLOAD,
+    // SSTORE,
     JUMP,
     JUMPI,
     PC,
@@ -96,7 +96,7 @@ pub enum ExecutionState {
     PUSH, // PUSH0, PUSH1, PUSH2, ..., PUSH32
     DUP,  // DUP1, DUP2, ..., DUP16
     SWAP, // SWAP1, SWAP2, ..., SWAP16
-    LOG,  // LOG0, LOG1, ..., LOG4
+    // LOG,  // LOG0, LOG1, ..., LOG4
     CREATE,
     CREATE2,
     CALL_OP,       // CALL, CALLCODE, DELEGATECALL, STATICCALL
@@ -117,12 +117,12 @@ pub enum ExecutionState {
     ErrorOutOfGasAccountAccess,
     // error for CodeStoreOOG and MaxCodeSizeExceeded
     ErrorCodeStore,
-    ErrorOutOfGasLOG,
+    // ErrorOutOfGasLOG,
     ErrorOutOfGasEXP,
     ErrorOutOfGasSHA3,
     ErrorOutOfGasCall,
     ErrorOutOfGasPrecompile,
-    ErrorOutOfGasSloadSstore,
+    // ErrorOutOfGasSloadSstore,
     ErrorOutOfGasCREATE,
     ErrorOutOfGasSELFDESTRUCT,
     // Precompiles
@@ -204,11 +204,9 @@ impl ExecutionState {
                 | Self::ErrorOutOfGasMemoryCopy
                 | Self::ErrorOutOfGasAccountAccess
                 | Self::ErrorCodeStore
-                | Self::ErrorOutOfGasLOG
                 | Self::ErrorOutOfGasEXP
                 | Self::ErrorOutOfGasSHA3
                 | Self::ErrorOutOfGasCall
-                | Self::ErrorOutOfGasSloadSstore
                 | Self::ErrorOutOfGasCREATE
                 | Self::ErrorOutOfGasSELFDESTRUCT
         )
@@ -250,8 +248,6 @@ impl ExecutionState {
             Self::SAR => vec![OpcodeId::SAR],
             Self::SHA3 => vec![OpcodeId::SHA3],
             Self::ADDRESS => vec![OpcodeId::ADDRESS],
-            Self::BALANCE => vec![OpcodeId::BALANCE],
-            Self::ORIGIN => vec![OpcodeId::ORIGIN],
             Self::CALLER => vec![OpcodeId::CALLER],
             Self::CALLVALUE => vec![OpcodeId::CALLVALUE],
             Self::CALLDATALOAD => vec![OpcodeId::CALLDATALOAD],
@@ -259,13 +255,8 @@ impl ExecutionState {
             Self::CALLDATACOPY => vec![OpcodeId::CALLDATACOPY],
             Self::CODESIZE => vec![OpcodeId::CODESIZE],
             Self::CODECOPY => vec![OpcodeId::CODECOPY],
-            Self::GASPRICE => vec![OpcodeId::GASPRICE],
-            Self::EXTCODESIZE => vec![OpcodeId::EXTCODESIZE],
-            Self::EXTCODECOPY => vec![OpcodeId::EXTCODECOPY],
             Self::RETURNDATASIZE => vec![OpcodeId::RETURNDATASIZE],
             Self::RETURNDATACOPY => vec![OpcodeId::RETURNDATACOPY],
-            Self::EXTCODEHASH => vec![OpcodeId::EXTCODEHASH],
-            Self::BLOCKHASH => vec![OpcodeId::BLOCKHASH],
             Self::BLOCKCTXU64 => vec![OpcodeId::TIMESTAMP, OpcodeId::NUMBER, OpcodeId::GASLIMIT],
             Self::BLOCKCTXU160 => vec![OpcodeId::COINBASE],
             Self::BLOCKCTXU256 => {
@@ -275,14 +266,11 @@ impl ExecutionState {
                     vec![OpcodeId::DIFFICULTY, OpcodeId::BASEFEE]
                 }
             }
-            Self::CHAINID => vec![OpcodeId::CHAINID],
             Self::SELFBALANCE => vec![OpcodeId::SELFBALANCE],
             Self::POP => vec![OpcodeId::POP],
             Self::MEMORY => {
                 vec![OpcodeId::MLOAD, OpcodeId::MSTORE, OpcodeId::MSTORE8]
             }
-            Self::SLOAD => vec![OpcodeId::SLOAD],
-            Self::SSTORE => vec![OpcodeId::SSTORE],
             Self::JUMP => vec![OpcodeId::JUMP],
             Self::JUMPI => vec![OpcodeId::JUMPI],
             Self::PC => vec![OpcodeId::PC],
@@ -359,13 +347,6 @@ impl ExecutionState {
                 OpcodeId::SWAP14,
                 OpcodeId::SWAP15,
                 OpcodeId::SWAP16,
-            ],
-            Self::LOG => vec![
-                OpcodeId::LOG0,
-                OpcodeId::LOG1,
-                OpcodeId::LOG2,
-                OpcodeId::LOG3,
-                OpcodeId::LOG4,
             ],
             Self::CREATE => vec![OpcodeId::CREATE],
             Self::CREATE2 => vec![OpcodeId::CREATE2],

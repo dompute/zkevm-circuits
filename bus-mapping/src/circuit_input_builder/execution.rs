@@ -180,15 +180,6 @@ impl ExecState {
         }
     }
 
-    /// Returns `true` if `ExecState` is an opcode and the opcode is a `Logn`.
-    pub fn is_log(&self) -> bool {
-        if let ExecState::Op(op) = self {
-            op.is_log()
-        } else {
-            false
-        }
-    }
-
     /// Returns `true` if the `ExecState` is one of the opcodes CALL, CALLCODE, STATICCALL or
     /// DELEGATECALL.
     pub fn is_call(&self) -> bool {
